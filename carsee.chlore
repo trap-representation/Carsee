@@ -36,7 +36,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:password_alloc_err
+:pass_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
   pop
@@ -44,7 +44,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:read_password_err
+:read_pass_err
   pushp "\ncarsee (error): failed to read from stdin\n"
   pushp putstre call
   pushp flush call
@@ -138,7 +138,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:pass_write_err
+:pass_send_err
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   get2 pushp closef call
@@ -148,7 +148,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:nick_write_err
+:nick_send_err
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   get2 pushp closef call
@@ -157,7 +157,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:user_write_err
+:user_send_err
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   get2 pushp closef call
@@ -208,7 +208,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:climsg_write_err
+:climsg_send_err
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   pushp flush call
@@ -217,8 +217,8 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:read_serv_err
-  pushp "\ncarsee (error): failed to read message from server\n"
+:recv_serv_err
+  pushp "\ncarsee (error): failed to receive message from server\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -235,7 +235,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:pong_write_err
+:pong_send_err
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   pop
@@ -277,52 +277,52 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp "\ncarsee (info): Nickname\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                         ;chunk to store the username
-    get0 pushi 1 pushp nickname_alloc_err jeq
+    pushl 511 pushp aseg call                              ;chunk to store the username
+    get0 pushp nickname_alloc_err jnz
 
     pushl 510
     over
     pushp getstr call
     get0 pushi EOF pushp read_nickname_err jeq
-    get0 write3                                        ;length of nickname
+    get0 write3                                            ;length of nickname
 
     pushp "\ncarsee (info): Password\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                         ;chunk to store the password
-    get0 pushi 1 pushp password_alloc_err jeq
+    pushl 511 pushp aseg call                              ;chunk to store the password
+    get0 pushp pass_alloc_err jnz
 
     pushl 510
     over
     pushp getstr call
-    get0 pushi EOF pushp read_password_err jeq
-    get0 write4                                        ;length of password
+    get0 pushi EOF pushp read_pass_err jeq
+    get0 write4                                            ;length of password
 
     pushp "\ncarsee (info): Username\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                         ;chunk to store the username
-    get0 pushi 1 pushp username_alloc_err jeq
+    pushl 511 pushp aseg call                              ;chunk to store the username
+    get0 pushp username_alloc_err jnz
 
     pushl 510
     over
     pushp getstr call
     get0 pushi EOF pushp read_username_err jeq
-    get0 write5                                        ;length of username
+    get0 write5                                            ;length of username
 
     pushi AF_INET
     pushi SOCK_STREAM
     pushi 0
-    pushp socket call                                ;the sd
+    pushp socket call                                      ;the sd
     get0 pushi -1 pushp creat_socket_err jeq
 
-    write2                                           ;save the sd in block 2
+    write2                                                 ;save the sd in block 2
 
     pushp "\ncarsee (info): Host\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                       ;chunk to store the host name
-    get0 pushi 1 pushp host_alloc_err jeq
+    pushl 511 pushp aseg call                              ;chunk to store the host name
+    get0 pushp host_alloc_err jnz
 
     pushl 510
     over
@@ -332,8 +332,8 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp "\ncarsee (info): Port\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                       ;chunk to store the port
-    get0 pushi 1 pushp port_alloc_err jeq
+    pushl 511 pushp aseg call                              ;chunk to store the port
+    get0 pushp port_alloc_err jnz
 
     pushl 510
     over
@@ -349,33 +349,33 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushi 0
     get2
     pushp connect call
-    get0 pushi 1 pushp connect_err jeq
+    get0 pushp connect_err jnz
 
     pushp "\ncarsee (info): connection successful\n" pushp putstre call
 
     pushp flush call
     pushp flush call
 
-    ;nickname password username
+    ;stack state: nickname password username
     swap
 
     get2
     pushp "PASS "
     pushui 5
-    pushp writef call                                 ;write to socket
-    get0 pushi -1 pushp pass_write_err jeq
+    pushp writef call                                      ;write to socket
+    get0 pushi -1 pushp pass_send_err jeq
 
     get2
     over
     get4
     pushp writef call
-    get0 pushi -1 pushp pass_write_err jeq
+    get0 pushi -1 pushp pass_send_err jeq
 
     get2
     pushp "\r\n"
     pushui 2
     pushp writef call
-    get0 pushi -1 pushp pass_write_err jeq
+    get0 pushi -1 pushp pass_send_err jeq
 
     pushp flush call
 
@@ -384,57 +384,60 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     get2
     pushp "NICK "
     pushui 5
-    pushp writef call                                 ;write to socket
-    get0 pushi -1 pushp nick_write_err jeq
+    pushp writef call                                      ;write to socket
+    get0 pushi -1 pushp nick_send_err jeq
 
     get2
     over
     get3
     pushp writef call
-    get0 pushi -1 pushp nick_write_err jeq
+    get0 pushi -1 pushp nick_send_err jeq
 
     get2
     pushp "\r\n"
     pushui 2
     pushp writef call
-    get0 pushi -1 pushp nick_write_err jeq
+    get0 pushi -1 pushp nick_send_err jeq
 
     pushp flush call
 
     get2
     pushp "USER "
     pushui 5
-    pushp writef call                                 ;write to socket
-    get0 pushi -1 pushp user_write_err jeq
+    pushp writef call                                      ;write to socket
+    get0 pushi -1 pushp user_send_err jeq
 
     get2
     over
     get5
     pushp writef call
-    get0 pushi -1 pushp user_write_err jeq
+    get0 pushi -1 pushp user_send_err jeq
 
     get2
     pushp "\r\n"
     pushui 2
     pushp writef call
-    get0 pushi -1 pushp user_write_err jeq
+    get0 pushi -1 pushp user_send_err jeq
 
     pushp flush call
 
     pushl 512 pushp aseg call
-    get0 pushi 1 pushp climsg_alloc_err jeq
+    get0 pushp climsg_alloc_err jnz
 
     pushp watch_new call
     dup pushi -1 pushp creat_watch_err jeq
     write3                                                 ;save the wd in block 3
 
     pushi 2 write5                                         ;it is used during "PING" for executing behavior similar to
-                                                         ;that of a state machine based on different values in block 5
+                                                           ;that of a state machine based on different values in block 5
 
-    pushi 0 write6                                       ;if it's set to 1, the output is "held"
+    pushi 0 write6                                         ;if it's set to a non-zero value, the output is "held"
+
+    pushi 0 write7                                         ;if it's set to a non-zero value, the socket is no longer accessible
 
     :loop
-      pushi 1 get6 pushp unhold jeq
+      get6 pushp unhold jnz
+
       pushp unheld jmp
 
       :unhold
@@ -468,7 +471,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
         get3
         pushi READFD
         pushp fd_isset call
-        pushp read_serv jnz
+        pushp recv_serv jnz
 
         pushi STDIN
         get3
@@ -481,22 +484,25 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           over
           pushp getstr call
           get0 pushi EOF pushp climsg_read_err jeq
-          get0 write4                                                     ;length of message
+          get0 write4                                      ;length of message
 
-          pushi 0 get4 pushp loop jeq
+          get4 get7 addi pushp loop jz
 
           dup pushp "/quit" pushp strcmp call pushp quit jz
-          dup pushp "/hold" pushp strcmp call pushp hold jz
-          dup pushp "/connect" pushp strcmp call pushp idc_connect_serv jz
+          dup pushp "/cconnect" pushp strcmp call pushp idc_connect_serv jz
           dup pushp "/help" pushp strcmp call pushp help jz
+          get7 pushp read_stdin jnz
+          dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
 
           :help
             pushp "\
-\ncarsee(info): /quit: quit client\n\
-\ncarsee(info): /hold: pause all operations until at least one character is read from stdin\n\
-\ncarsee(info): /connect: close the opened socket and connect to a (possibly different) server\n\
-\ncarsee(info): /help: display this help message\n"
+\ncarsee(info): /quit: close client\n\
+\ncarsee(info): /hold (i): pause all operations until at least one character is read from stdin\n\
+\ncarsee(info): /cconnect: close the opened socket and connect to a (possibly different) server\n\
+\ncarsee(info): /help: display this help message\n\
+\ncarsee(info): ---\n\
+\ncarsee(info): commands suffixed with ` (i)' are ignored once the server closes connection\n"
             pushp putstre call
             pushp loop jmp
 
@@ -528,119 +534,128 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             over
             get4 ;message length
             pushp writef call
-            get0 pushi -1 pushp climsg_write_err jeq
+            get0 pushi -1 pushp climsg_send_err jeq
 
             get2
             pushp "\r\n"
             pushi 2
             pushp writef call
-            get0 pushi -1 pushp climsg_write_err jeq
+            get0 pushi -1 pushp climsg_send_err jeq
 
             pushp loop jmp
 
-        :read_serv
+        :recv_serv
           get2
           over ;allocated chunk
           pushl 512
           pushp readf call
-          get0 pushi -1 pushp read_serv_err jeq
+          get0 pushi -1 pushp recv_serv_err jeq
           get0 write3
 
-          get3 pushi 0 pushp quit jeq
-  
-          pushi STDOUT
-          over
-          get3
-          pushp writef call
-          get0 pushi -1 pushp servmsg_write_err jeq
+          get3 pushp serv_closed_connection jz
 
-          dup
+          pushp continue_servmsg_write jmp
 
-          :check_ping
-            get5 pushi 0 pushp check_ssr jeq
-            get5 pushi 1 pushp check_ssn jeq
-            get5 pushi 2 pushp check_P jeq
-            get5 pushi 3 pushp check_I jeq
-            get5 pushi 4 pushp check_N jeq
-            get5 pushi 5 pushp check_G jeq
-            get5 pushi 6 pushp check_esr jeq
-            get5 pushi 7 pushp check_esn jeq
+          :serv_closed_connection
+            pushp "\ncarsee(info): server closed connection\n"
+            pushp putstre call
+            pushi 1 write7
+            pushp read_stdin jmp
 
-            :inc_b5
-              pushi 1 get5 addi write5
-              pushp continue_checking_ping jmp
+          :continue_servmsg_write
+            pushi STDOUT
+            over
+            get3
+            pushp writef call
+            get0 pushi -1 pushp servmsg_write_err jeq
 
-            :continue_checking_ping
-              pushi 1 addp
-              pushi 1 get3 subl dup write3
-              pushp check_ping jnz
-              pop
-              pushp loop jmp
+            dup
 
-            :check_ssr
-              pushc '\r' over loadc pushp inc_b5 jeq
-              pushp continue_checking_ping jmp
+            :check_ping
+              get5 pushi 0 pushp check_ssr jeq
+              get5 pushi 1 pushp check_ssn jeq
+              get5 pushi 2 pushp check_P jeq
+              get5 pushi 3 pushp check_I jeq
+              get5 pushi 4 pushp check_N jeq
+              get5 pushi 5 pushp check_G jeq
+              get5 pushi 6 pushp check_esr jeq
+              get5 pushi 7 pushp check_esn jeq
 
-            :check_ssn
-              pushc '\n' over loadc pushp inc_b5 jeq
-              pushi 0 write5
-              pushp continue_checking_ping jmp
+              :inc_b5
+                pushi 1 get5 addi write5
+                pushp continue_checking_ping jmp
 
-            :check_P
-              pushc 'P' over loadc pushp inc_b5 jeq
-              pushi 0 write5
-              pushp continue_checking_ping jmp
+              :continue_checking_ping
+                pushi 1 addp
+                pushi 1 get3 subl dup write3
+                pushp check_ping jnz
+                pop
+                pushp loop jmp
 
-            :check_I
-              pushc 'I' over loadc pushp inc_b5 jeq
-              pushi 0 write5
-              pushp check_P jmp
+              :check_ssr
+                pushc '\r' over loadc pushp inc_b5 jeq
+                pushp continue_checking_ping jmp
 
-            :check_N
-              pushc 'N' over loadc pushp inc_b5 jeq
-              pushi 0 write5
-              pushp check_P jmp
+              :check_ssn
+                pushc '\n' over loadc pushp inc_b5 jeq
+                pushi 0 write5
+                pushp continue_checking_ping jmp
 
-            :check_G
-              pushc 'G' over loadc pushp write_pong jeq
-              pushi 0 write5
-              pushp check_P jmp
+              :check_P
+                pushc 'P' over loadc pushp inc_b5 jeq
+                pushi 0 write5
+                pushp continue_checking_ping jmp
 
-              :write_pong
+              :check_I
+                pushc 'I' over loadc pushp inc_b5 jeq
+                pushi 0 write5
+                pushp check_P jmp
+
+              :check_N
+                pushc 'N' over loadc pushp inc_b5 jeq
+                pushi 0 write5
+                pushp check_P jmp
+
+              :check_G
+                pushc 'G' over loadc pushp send_pong jeq
+                pushi 0 write5
+                pushp check_P jmp
+
+                :send_pong
+                  pushi 6 write5
+
+                  get2
+                  pushp "PONG"
+                  pushi 4
+                  pushp writef call
+                  get0 pushi -1 pushp pong_send_err jeq
+
+                  pushp continue_checking_ping jmp
+
+              :check_esr
+                get2
+                over
+                pushi 1
+                pushp writef call
+                get0 pushi -1 pushp pong_send_err jeq
+
+                pushc '\r' over loadc pushp inc_b5 jeq
+
+                pushp continue_checking_ping jmp
+
+              :check_esn
                 pushi 6 write5
 
                 get2
-                pushp "PONG"
-                pushi 4
+                over
+                pushi 1
                 pushp writef call
-                get0 pushi -1 pushp pong_write_err jeq
+                get0 pushi -1 pushp pong_send_err jeq
 
-                pushp continue_checking_ping jmp
+                pushc '\n' over loadc pushp end_pong_msg jeq
 
-            :check_esr
-              get2
-              over
-              pushi 1
-              pushp writef call
-              get0 pushi -1 pushp pong_write_err jeq
+               pushp continue_checking_ping jmp
 
-              pushc '\r' over loadc pushp inc_b5 jeq
-
-              pushp continue_checking_ping jmp
-
-            :check_esn
-              pushi 6 write5
-
-              get2
-              over
-              pushi 1
-              pushp writef call
-              get0 pushi -1 pushp pong_write_err jeq
-
-              pushc '\n' over loadc pushp end_pong_msg jeq
-
-             pushp continue_checking_ping jmp
-
-              :end_pong_msg
-                pushi 2 write5
-                pushp continue_checking_ping jmp
+                :end_pong_msg
+                  pushi 2 write5
+                  pushp continue_checking_ping jmp
