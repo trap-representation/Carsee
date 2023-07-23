@@ -483,7 +483,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           get0 pushi EOF pushp climsg_read_err jeq
           get0 write4                                                     ;length of message
 
-          pushi 0 get4 pushp read_stdin jeq
+          pushi 0 get4 pushp loop jeq
 
           dup pushp "/quit" pushp strcmp call pushp quit jz
           dup pushp "/hold" pushp strcmp call pushp hold jz
@@ -494,7 +494,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           :help
             pushp "\
 \ncarsee(info): /quit: quit client\n\
-\ncarsee(info): /hold: pause all operations until at least one non-newline character is read from stdin\n\
+\ncarsee(info): /hold: pause all operations until at least one character is read from stdin\n\
 \ncarsee(info): /connect: close the opened socket and connect to a (possibly different) server\n\
 \ncarsee(info): /help: display this help message\n"
             pushp putstre call
