@@ -199,6 +199,15 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
+:test_reply_err
+  pushp "\ncarsee (error): failed to reply to test\n"
+  pushp putstre call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
 :climsg_preview_err
   pushp "\ncarsee (error): failed to write preview to stdout\n"
   pushp putstre call
@@ -433,7 +442,8 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
     pushi 0 write6                                         ;if it's set to a non-zero value, the output is "held"
 
-    pushi 0 write7                                         ;if it's set to a non-zero value, the socket is no longer accessible
+    pushi 0 write7                                         ;if it's set to a non-zero value, the socket is no
+                                                           ;longer accessible
 
     :loop
       get6 pushp unhold jnz
@@ -490,19 +500,44 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
           dup pushp "/quit" pushp strcmp call pushp quit jz
           dup pushp "/cconnect" pushp strcmp call pushp idc_connect_serv jz
+          dup pushp "/test" pushp strcmp call pushp test jz
           dup pushp "/help" pushp strcmp call pushp help jz
+          dup pushp "/status" pushp strcmp call pushp status jz
           get7 pushp read_stdin jnz
           dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
 
+          :status
+            get7 pushp status_connected jz
+            pushp status_not_connected jmp
+
+            :status_not_connected
+              pushp "\ncarsee (info): server has closed connection\n"
+              pushp putstre call
+              pushp read_stdin jmp
+
+            :status_connected
+              pushp "\ncarsee (info): server has NOT closed connection\n"
+              pushp putstre call
+              pushp loop jmp
+
+          :test
+            pushp "\ncarsee (info): passed\n"
+            pushp putstre call
+            get0 pushi EOF pushp test_reply_err jeq
+            get7 pushp read_stdin jnz
+            pushp loop jmp
+
           :help
             pushp "\
-\ncarsee(info): /quit: close client\n\
-\ncarsee(info): /hold (i): pause all operations until at least one character is read from stdin\n\
-\ncarsee(info): /cconnect: close the opened socket and connect to a (possibly different) server\n\
-\ncarsee(info): /help: display this help message\n\
-\ncarsee(info): ---\n\
-\ncarsee(info): commands suffixed with ` (i)' are ignored once the server closes connection\n"
+\ncarsee (info): /quit: close client\n\
+\ncarsee (info): /hold (i): pauses all operations until at least one character is read from stdin\n\
+\ncarsee (info): /cconnect: connects to a (possibly different) server\n\
+\ncarsee (info): /test: writes a \"passed\" message to stderr\n\
+\ncarsee (info): /status: writes the connection status of the server to stderr\n\
+\ncarsee (info): /help: displays this help message\n\
+\ncarsee (info): ---\n\
+\ncarsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
             pushp putstre call
             pushp loop jmp
 
@@ -557,7 +592,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           pushp continue_servmsg_write jmp
 
           :serv_closed_connection
-            pushp "\ncarsee(info): server closed connection\n"
+            pushp "\ncarsee (info): server closed connection\n"
             pushp putstre call
             pushi 1 write7
             pushp read_stdin jmp
