@@ -529,15 +529,15 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             pushp loop jmp
 
           :help
-            pushp "\
-\ncarsee (info): /quit: close client\n\
-\ncarsee (info): /hold (i): pauses all operations until at least one character is read from stdin\n\
-\ncarsee (info): /cconnect: connects to a (possibly different) server\n\
-\ncarsee (info): /test: writes a \"passed\" message to stderr\n\
-\ncarsee (info): /status: writes the connection status of the server to stderr\n\
-\ncarsee (info): /help: displays this help message\n\
-\ncarsee (info): ---\n\
-\ncarsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
+            pushp "\n\
+carsee (info): /quit: close client\n\
+carsee (info): /hold (i): pauses all operations until at least one character is read from stdin\n\
+carsee (info): /cconnect: connects to a (possibly different) server\n\
+carsee (info): /test: writes a \"passed\" message to stderr\n\
+carsee (info): /status: writes the connection status of the server to stderr\n\
+carsee (info): /help: displays this help message\n\
+carsee (info): ---\n\
+carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
             pushp putstre call
             pushp loop jmp
 
