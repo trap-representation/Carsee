@@ -30,7 +30,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :read_nickname_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   pushp phclean call
@@ -45,7 +45,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :read_pass_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   pushp flush call
@@ -62,7 +62,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :read_username_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   pushp flush call
@@ -92,7 +92,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :read_host_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -115,7 +115,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :read_port_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   pushp flush call
@@ -182,7 +182,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :watch_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -191,7 +191,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :climsg_read_err
-  pushp "\ncarsee (error): failed to read from stdin\n"
+  pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -209,7 +209,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :climsg_preview_err
-  pushp "\ncarsee (error): failed to write preview to stdout\n"
+  pushp "\ncarsee (error): failed to display message preview\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -236,7 +236,7 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :servmsg_write_err
-  pushp "\ncarsee (error): failed to write servent-sent message to stdout\n"
+  pushp "\ncarsee (error): failed to display servent-sent message\n"
   pushp putstre call
   pushp flush call
   get2 pushp closef call
@@ -487,9 +487,9 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
         get3
         pushi READFD
         pushp fd_isset call
-        pushp read_stdin jnz
+        pushp read_input_source jnz
 
-        :read_stdin
+        :read_input_source
           pushl 510
           over
           pushp getstr call
@@ -503,7 +503,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           dup pushp "/test" pushp strcmp call pushp test jz
           dup pushp "/help" pushp strcmp call pushp help jz
           dup pushp "/status" pushp strcmp call pushp status jz
-          get7 pushp read_stdin jnz
+          get7 pushp read_input_source jnz
           dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
 
@@ -514,7 +514,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             :status_not_connected
               pushp "\ncarsee (info): server has closed connection\n"
               pushp putstre call
-              pushp read_stdin jmp
+              pushp read_input_source jmp
 
             :status_connected
               pushp "\ncarsee (info): server has NOT closed connection\n"
@@ -525,16 +525,16 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             pushp "\ncarsee (info): passed\n"
             pushp putstre call
             get0 pushi EOF pushp test_reply_err jeq
-            get7 pushp read_stdin jnz
+            get7 pushp read_input_source jnz
             pushp loop jmp
 
           :help
             pushp "\n\
 carsee (info): /quit: close client\n\
-carsee (info): /hold (i): pauses all operations until at least one character is read from stdin\n\
+carsee (info): /hold (i): pauses all operations until at least one character is received from the input source\n\
 carsee (info): /cconnect: connects to a (possibly different) server\n\
-carsee (info): /test: writes a \"passed\" message to stderr\n\
-carsee (info): /status: writes the connection status of the server to stderr\n\
+carsee (info): /test: replies with a \"passed\" message\n\
+carsee (info): /status: displays the connection status of the server\n\
 carsee (info): /help: displays this help message\n\
 carsee (info): ---\n\
 carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
@@ -550,13 +550,13 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
           :hold
             pushp "\ncarsee (info): held\n" pushp putstre call
             pushi 1 write6
-            pushp read_stdin jmp
+            pushp read_input_source jmp
 
           :continue_to_preview
             pushp "\ncarsee (preview): " pushp putstre call
             get0 pushi EOF pushp climsg_preview_err jeq
 
-            pushi STDOUT
+            pushi STDERR
             over
             get4 ;message length
             pushp writef call
@@ -595,10 +595,10 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
             pushp "\ncarsee (info): server closed connection\n"
             pushp putstre call
             pushi 1 write7
-            pushp read_stdin jmp
+            pushp read_input_source jmp
 
           :continue_servmsg_write
-            pushi STDOUT
+            pushi STDERR
             over
             get3
             pushp writef call
