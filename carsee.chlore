@@ -330,7 +330,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp "\ncarsee (info): Host\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the host name
+    pushl 511 pushp aseg call                              ;chunk to store the host
     get0 pushp host_alloc_err jnz
 
     pushl 510
@@ -588,7 +588,6 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
           get0 write3
 
           get3 pushp serv_closed_connection jz
-
           pushp continue_servmsg_write jmp
 
           :serv_closed_connection
