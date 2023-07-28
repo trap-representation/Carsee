@@ -36,6 +36,11 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
+:trunc_nickname_err
+  pushp flush call
+  pushp phclean call
+  pushi 1 hltr
+
 :pass_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
@@ -47,6 +52,12 @@ import "exit.chloreh"
 :read_pass_err
   pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
+  pushp flush call
+  pushp flush call
+  pushp phclean call
+  pushi 1 hltr
+
+:trunc_pass_err
   pushp flush call
   pushp flush call
   pushp phclean call
@@ -64,6 +75,13 @@ import "exit.chloreh"
 :read_username_err
   pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
+  pushp flush call
+  pushp flush call
+  pushp flush call
+  pushp phclean call
+  pushi 1 hltr
+
+:trunc_username_err
   pushp flush call
   pushp flush call
   pushp flush call
@@ -102,6 +120,15 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
+:trunc_host_err
+  pushp flush call
+  get2 pushp closef call
+  pushp flush call
+  pushp flush call
+  pushp flush call
+  pushp phclean call
+  pushi 1 hltr
+
 :port_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
@@ -117,6 +144,16 @@ import "exit.chloreh"
 :read_port_err
   pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  pushp flush call
+  pushp flush call
+  pushp flush call
+  pushp phclean call
+  pushi 1 hltr
+
+:trunc_port_err
   pushp flush call
   pushp flush call
   get2 pushp closef call
@@ -165,7 +202,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:climsg_alloc_err
+:msg_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
   get2 pushp closef call
@@ -198,6 +235,14 @@ import "exit.chloreh"
   get3 pushp watch_close call
   pushp phclean call
   pushi 1 hltr
+
+:trunc_climsg_err
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
 
 :test_reply_err
   pushp "\ncarsee (error): failed to reply to test\n"
@@ -262,6 +307,54 @@ import "exit.chloreh"
   get3 pushp watch_close call
   hlt
 
+set MSG_LEN 512
+set MSG_LEN1 511
+set MSG_LEN2 510
+
+:consume_input_if_too_large                                ;this subroutine truncates messages received
+                                                           ;from the input source if they're > 510 bytes
+                                                           ;it also replaces the newline (if any) at the
+                                                           ;end of the source buffer with a null terminator
+  ;stack state: buf size return
+  swap write0
+  swap
+  get0
+  addp
+  dup loadc pushc '\n' pushp skip_consume jeq
+  pushp init_loop_consume jmp
+
+  :skip_consume
+    pushc '\0' swap storec
+    pushi 0
+    swap
+    ret
+
+  :init_loop_consume
+    pop
+
+    :loop_consume
+      pushp getchar call
+      dup pushi EOF pushp end_consume jeq
+      dup pushi '\n' pushp end_consume jeq
+      pushi 0 pushp end_consume_err jgt
+      pushp loop_consume jmp
+
+      :end_consume
+        pushp "\ncarsee (info): message truncated\n"
+        pushp putstre call
+        pop
+        pushi 0
+        swap
+        ret
+
+      :end_consume_err
+        pushp "\ncarsee (error): failed to read from input source\n"
+        pushp putstre call
+        pop
+        pushi 1
+        swap
+        ret
+
 :main
   pushp "\
 carsee (info): Carsee is an IRC client\n\
@@ -286,38 +379,47 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp "\ncarsee (info): Nickname\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the username
+    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
     get0 pushp nickname_alloc_err jnz
 
-    pushl 510
+    pushl MSG_LEN2
     over
     pushp getstr call
     get0 pushi EOF pushp read_nickname_err jeq
     get0 write3                                            ;length of nickname
 
+    dup get0 pushp consume_input_if_too_large call
+    pushp trunc_nickname_err jnz
+
     pushp "\ncarsee (info): Password\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the password
+    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the password
     get0 pushp pass_alloc_err jnz
 
-    pushl 510
+    pushl MSG_LEN2
     over
     pushp getstr call
     get0 pushi EOF pushp read_pass_err jeq
     get0 write4                                            ;length of password
 
+    dup get0 pushp consume_input_if_too_large call
+    pushp trunc_pass_err jnz
+
     pushp "\ncarsee (info): Username\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the username
+    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
     get0 pushp username_alloc_err jnz
 
-    pushl 510
+    pushl MSG_LEN2
     over
     pushp getstr call
     get0 pushi EOF pushp read_username_err jeq
     get0 write5                                            ;length of username
+
+    dup get0 pushp consume_input_if_too_large call
+    pushp trunc_username_err jnz
 
     pushi AF_INET
     pushi SOCK_STREAM
@@ -330,24 +432,30 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp "\ncarsee (info): Host\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the host
+    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the host
     get0 pushp host_alloc_err jnz
 
-    pushl 510
+    pushl MSG_LEN2
     over
     pushp getstr call
     get0 pushi EOF pushp read_host_err jeq
 
+    dup get0 pushp consume_input_if_too_large call
+    pushp trunc_host_err jnz
+
     pushp "\ncarsee (info): Port\n"
     pushp putstre call
 
-    pushl 511 pushp aseg call                              ;chunk to store the port
+    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the port
     get0 pushp port_alloc_err jnz
 
-    pushl 510
+    pushl MSG_LEN2
     over
     pushp getstr call
     get0 pushi EOF pushp read_port_err jeq
+
+    dup get0 pushp consume_input_if_too_large call
+    pushp trunc_port_err jnz
 
     over
     over
@@ -430,8 +538,8 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
     pushp flush call
 
-    pushl 512 pushp aseg call
-    get0 pushp climsg_alloc_err jnz
+    pushl MSG_LEN pushp aseg call
+    get0 pushp msg_alloc_err jnz
 
     pushp watch_new call
     dup pushi -1 pushp creat_watch_err jeq
@@ -490,11 +598,14 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
         pushp read_input_source jnz
 
         :read_input_source
-          pushl 510
+          pushl MSG_LEN2
           over
           pushp getstr call
           get0 pushi EOF pushp climsg_read_err jeq
           get0 write4                                      ;length of message
+
+          dup get0 pushp consume_input_if_too_large call
+          pushp trunc_climsg_err jnz
 
           get4 get7 addi pushp loop jz
 
@@ -582,7 +693,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
         :recv_serv
           get2
           over ;allocated chunk
-          pushl 512
+          pushl MSG_LEN
           pushp readf call
           get0 pushi -1 pushp recv_serv_err jeq
           get0 write3
