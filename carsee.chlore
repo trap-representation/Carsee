@@ -202,9 +202,17 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
+:atdname_alloc_err
+  pushp "\ncarsee (error): failed to allocate enough memory\n"
+  pushp putstre call
+  get2 pushp closef call
+  pushp phclean call
+  pushi 1 hltr
+
 :msg_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
+  pushp flush call
   get2 pushp closef call
   pushp phclean call
   pushi 1 hltr
@@ -214,6 +222,7 @@ import "exit.chloreh"
   pushp putstre call
   pop
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   pushp phclean call
   pushi 1 hltr
@@ -221,6 +230,7 @@ import "exit.chloreh"
 :watch_err
   pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
+  pushp flush call
   pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
@@ -231,12 +241,14 @@ import "exit.chloreh"
   pushp "\ncarsee (error): failed to read from input source\n"
   pushp putstre call
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
   pushp phclean call
   pushi 1 hltr
 
 :trunc_climsg_err
+  pushp flush call
   pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
@@ -248,6 +260,7 @@ import "exit.chloreh"
   pushp "\ncarsee (error): failed to reply to test\n"
   pushp putstre call
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
   pushp phclean call
@@ -256,6 +269,7 @@ import "exit.chloreh"
 :climsg_preview_err
   pushp "\ncarsee (error): failed to display message preview\n"
   pushp putstre call
+  pushp flush call
   pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
@@ -266,6 +280,7 @@ import "exit.chloreh"
   pushp "\ncarsee (error): failed to send message to server\n"
   pushp putstre call
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
   pushp phclean call
@@ -275,6 +290,7 @@ import "exit.chloreh"
   pushp "\ncarsee (error): failed to receive message from server\n"
   pushp putstre call
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
   pushp phclean call
@@ -283,6 +299,25 @@ import "exit.chloreh"
 :servmsg_write_err
   pushp "\ncarsee (error): failed to display servent-sent message\n"
   pushp putstre call
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
+:read_atname_err
+  pushp "\ncarsee (error): failed to send message to server\n"
+  pushp putstre call
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
+:trunc_atname_err
+  pushp flush call
   pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
@@ -294,13 +329,16 @@ import "exit.chloreh"
   pushp putstre call
   pop
   pushp flush call
+  pushp flush call
   get2 pushp closef call
   get3 pushp watch_close call
   pushp phclean call
   pushi 1 hltr
 
 :quit
-  pushp "\ncarsee (info): quitting\n" pushp putstre call
+  pushp "\ncarsee (info): quitting\n"
+  pushp putstre call
+  pushp flush call
   pushp flush call
   pushp phclean call
   get2 pushp closef call
@@ -323,6 +361,13 @@ set MSG_LEN2 510
   dup loadc pushc '\n' pushp skip_consume jeq
   pushp init_loop_consume jmp
 
+  :zerosize_buf
+    swap pop
+    swap pop
+    pushi 0
+    swap
+    ret
+
   :skip_consume
     pushc '\0' swap storec
     pushi 0
@@ -335,7 +380,7 @@ set MSG_LEN2 510
     :loop_consume
       pushp getchar call
       dup pushi EOF pushp end_consume jeq
-      dup pushi '\n' pushp end_consume jeq
+      dup pushc '\n' pushp end_consume jeq
       pushi 0 pushp end_consume_err jgt
       pushp loop_consume jmp
 
@@ -376,7 +421,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
   :connect_serv
 
-    pushp "\ncarsee (info): Nickname\n"
+    pushp "\ncarsee (info): nickname\n"
     pushp putstre call
 
     pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
@@ -391,7 +436,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     dup get0 pushp consume_input_if_too_large call
     pushp trunc_nickname_err jnz
 
-    pushp "\ncarsee (info): Password\n"
+    pushp "\ncarsee (info): password\n"
     pushp putstre call
 
     pushl MSG_LEN1 pushp aseg call                         ;chunk to store the password
@@ -406,7 +451,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     dup get0 pushp consume_input_if_too_large call
     pushp trunc_pass_err jnz
 
-    pushp "\ncarsee (info): Username\n"
+    pushp "\ncarsee (info): username\n"
     pushp putstre call
 
     pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
@@ -429,7 +474,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
     write2                                                 ;save the sd in block 2
 
-    pushp "\ncarsee (info): Host\n"
+    pushp "\ncarsee (info): host\n"
     pushp putstre call
 
     pushl MSG_LEN1 pushp aseg call                         ;chunk to store the host
@@ -443,7 +488,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     dup get0 pushp consume_input_if_too_large call
     pushp trunc_host_err jnz
 
-    pushp "\ncarsee (info): Port\n"
+    pushp "\ncarsee (info): port\n"
     pushp putstre call
 
     pushl MSG_LEN1 pushp aseg call                         ;chunk to store the port
@@ -538,6 +583,22 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
     pushp flush call
 
+
+    pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
+                                                           ;messages to respond to "PING"s
+
+    pushi -1 write6                                        ;offset into the at'd name; used during atname check
+
+    pushui 0 write7                                        ;if it's set to a non-zero value, the socket is no
+                                                           ;longer accessible
+
+    pushui 0                                               ;if it's set to a non-zero value, the output is "held"
+
+    pushl MSG_LEN1 pushp aseg call
+    get0 pushp atdname_alloc_err jnz
+
+    pushc '\0' over storec
+
     pushl MSG_LEN pushp aseg call
     get0 pushp msg_alloc_err jnz
 
@@ -545,22 +606,24 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     dup pushi -1 pushp creat_watch_err jeq
     write3                                                 ;save the wd in block 3
 
-    pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
-                                                           ;messages to respond to "PING"s
-
-    pushi 0 write6                                         ;if it's set to a non-zero value, the output is "held"
-
-    pushi 0 write7                                         ;if it's set to a non-zero value, the socket is no
-                                                           ;longer accessible
-
     :loop
-      get6 pushp unhold jnz
+      write0
+      over
+      get0
+      swap
+      pushp unhold jnz
 
       pushp unheld jmp
 
       :unhold
         pushp "\ncarsee (info): unheld\n" pushp putstre call
-        pushi 0 write6
+        write0
+        swap
+        pop
+        pushui 0
+        swap
+        get0
+        pushp unheld jmp
 
       :unheld
         get3
@@ -614,9 +677,43 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           dup pushp "/test" pushp strcmp call pushp test jz
           dup pushp "/help" pushp strcmp call pushp help jz
           dup pushp "/status" pushp strcmp call pushp status jz
+          dup pushp "/setatname" pushp strcmp call pushp setatname jz
           get7 pushp read_input_source jnz
           dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
+
+          :setatname
+            pushp "\ncarsee (info): atname\n"
+            pushp putstre call
+
+            over
+
+            pushl MSG_LEN2
+            swap
+            pushp getstr call
+            get0 pushi EOF pushp read_atname_err jeq
+
+            over get0 pushp consume_input_if_too_large call
+            pushp trunc_atname_err jnz
+
+            over
+            pushp "\ncarsee (info): atname set to '%t'\n"
+            pushp putfmte call
+
+            over
+            pushc '@'
+            swap
+            pushp chrstr call
+            pushi -1 pushp atname_contains_at jne
+
+            get7 pushp read_input_source jnz
+            pushp loop jmp
+
+            :atname_contains_at
+              pushp "\ncarsee (info): atname cannot contain the symbol '@'\n"
+              pushp putstre call
+              get7 pushp read_input_source jnz
+              pushp loop jmp
 
           :status
             get7 pushp status_connected jz
@@ -660,7 +757,12 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
           :hold
             pushp "\ncarsee (info): held\n" pushp putstre call
-            pushi 1 write6
+            write0
+            swap
+            pop
+            pushui 1
+            swap
+            get0
             pushp read_input_source jmp
 
           :continue_to_preview
@@ -684,7 +786,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
             get2
             pushp "\r\n"
-            pushi 2
+            pushui 2
             pushp writef call
             get0 pushi -1 pushp climsg_send_err jeq
 
@@ -696,21 +798,21 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
           pushl MSG_LEN
           pushp readf call
           get0 pushi -1 pushp recv_serv_err jeq
-          get0 write3
+          get0 write4
 
-          get3 pushp serv_closed_connection jz
+          get4 pushp serv_closed_connection jz
           pushp continue_servmsg_write jmp
 
           :serv_closed_connection
             pushp "\ncarsee (info): server closed connection\n"
             pushp putstre call
-            pushi 1 write7
+            pushui 1 write7
             pushp read_input_source jmp
 
           :continue_servmsg_write
             pushi STDERR
             over
-            get3
+            get4
             pushp writef call
             get0 pushi -1 pushp servmsg_write_err jeq
 
@@ -729,7 +831,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
             set state_esr 10
             set state_esn 11
 
-            :check_ping
+            :check_ping_and_atname
               get5 pushui state_ssr pushp check_ssr jeq
               get5 pushui state_ssn pushp check_ssn jeq
               get5 pushui state_P_or_colon pushp check_P_or_colon jeq
@@ -743,24 +845,53 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
               get5 pushui state_esr pushp check_esr jeq
               get5 pushui state_esn pushp check_esn jeq
 
-              :continue_checking_ping
-                pushi 1 addp
-                pushi 1 get3 subl dup write3
-                pushp check_ping jnz
-                pop
-                pushp loop jmp
+              :check_atname
+                write0 over get0 swap loadc pushp continue_checking jz
+                pushc '@' over loadc pushp found_at jeq
+                pushi -1 get6 pushp match_atname jgt
+                pushp continue_checking jmp
+
+                :match_atname
+                  write0 over get0 swap
+                  get6 addp loadc over loadc pushp atname_onematch jeq
+                  pushp atname_notmatch jmp
+
+                  :atname_onematch
+                    pushui 1 get6 addl write6
+                    write0 over get0 swap get6 addp loadc pushp allmatch_atname jz
+                    pushp continue_checking jmp
+
+                    :allmatch_atname
+                      pushp "\a" pushp putstre call
+                      pushi -1 write6
+                      pushp continue_checking jmp
+
+                  :atname_notmatch
+                    pushi -1 write6
+                    pushp continue_checking jmp
+
+                :found_at
+                  pushui 0 write6
+                  pushp continue_checking jmp
+
+                :continue_checking
+                  pushui 1 addp
+                  pushui 1 get4 subl dup write4
+                  pushp check_ping_and_atname jnz
+                  pop
+                  pushp loop jmp
 
               :transition_to_ssr
                 pushui state_ssr write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_ssr
                 pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :transition_to_ssn
                 pushui state_ssn write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_ssn
                 pushc '\n' over loadc pushp transition_to_P_or_colon jeq
@@ -769,7 +900,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_P_or_colon
                 pushui state_P_or_colon write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_P_or_colon
                 pushc 'P' over loadc pushp transition_to_I jeq
@@ -779,7 +910,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_prefix
                 pushui state_prefix write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_prefix
                 pushc ' ' over loadc pushp transition_to_atleastonespace jeq
@@ -788,7 +919,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_atleastonespace
                 pushui state_atleastonespace write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_atleastonespace
                 pushc ' ' over loadc pushp transition_to_optspacesequence jeq
@@ -797,7 +928,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_optspacesequence
                 pushui state_optspacesequence write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_optspacesequence
                 pushc ' ' over loadc pushp transition_to_optspacesequence jeq
@@ -807,7 +938,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_I
                 pushui state_I write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_I
                 pushc 'I' over loadc pushp transition_to_N jeq
@@ -816,7 +947,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_N
                 pushui state_N write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_N
                 pushc 'N' over loadc pushp transition_to_G jeq
@@ -825,7 +956,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_G
                 pushui state_G write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_G
                 pushc 'G' over loadc pushp transition_to_space jeq
@@ -834,7 +965,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_space
                 pushui state_space write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_space
                 pushc ' ' over loadc pushp send_pong jeq
@@ -844,7 +975,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
                 :send_pong
                   get2
                   pushp "PONG "
-                  pushi 5
+                  pushui 5
                   pushp writef call
                   get0 pushi -1 pushp pong_send_err jeq
 
@@ -852,26 +983,26 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
               :transition_to_esr
                 pushui state_esr write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_esr
                 get2
                 over
-                pushi 1
+                pushui 1
                 pushp writef call
                 get0 pushi -1 pushp pong_send_err jeq
 
                 pushc '\r' over loadc pushp transition_to_esn jeq
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :transition_to_esn
                 pushui state_esn write5
-                pushp continue_checking_ping jmp
+                pushp check_atname jmp
 
               :check_esn
                 get2
                 over
-                pushi 1
+                pushui 1
                 pushp writef call
                 get0 pushi -1 pushp pong_send_err jeq
 
