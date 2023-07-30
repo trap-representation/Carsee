@@ -545,8 +545,8 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     dup pushi -1 pushp creat_watch_err jeq
     write3                                                 ;save the wd in block 3
 
-    pushi 2 write5                                         ;it is used during "PING" for executing behavior similar to
-                                                           ;that of a state machine based on different values in block 5
+    pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
+                                                           ;messages to respond to "PING"s
 
     pushi 0 write6                                         ;if it's set to a non-zero value, the output is "held"
 
@@ -716,19 +716,32 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
             dup
 
-            :check_ping
-              get5 pushi 0 pushp check_ssr jeq
-              get5 pushi 1 pushp check_ssn jeq
-              get5 pushi 2 pushp check_P jeq
-              get5 pushi 3 pushp check_I jeq
-              get5 pushi 4 pushp check_N jeq
-              get5 pushi 5 pushp check_G jeq
-              get5 pushi 6 pushp check_esr jeq
-              get5 pushi 7 pushp check_esn jeq
+            set state_ssr 0
+            set state_ssn 1
+            set state_P_or_colon 2
+            set state_prefix 3
+            set state_atleastonespace 4
+            set state_optspacesequence 5
+            set state_I 6
+            set state_N 7
+            set state_G 8
+            set state_space 9
+            set state_esr 10
+            set state_esn 11
 
-              :inc_b5
-                pushi 1 get5 addi write5
-                pushp continue_checking_ping jmp
+            :check_ping
+              get5 pushui state_ssr pushp check_ssr jeq
+              get5 pushui state_ssn pushp check_ssn jeq
+              get5 pushui state_P_or_colon pushp check_P_or_colon jeq
+              get5 pushui state_prefix pushp check_prefix jeq
+              get5 pushui state_atleastonespace pushp check_atleastonespace jeq
+              get5 pushui state_optspacesequence pushp check_optspacesequence jeq
+              get5 pushui state_I pushp check_I jeq
+              get5 pushui state_N pushp check_N jeq
+              get5 pushui state_G pushp check_G jeq
+              get5 pushui state_space pushp check_space jeq
+              get5 pushui state_esr pushp check_esr jeq
+              get5 pushui state_esn pushp check_esn jeq
 
               :continue_checking_ping
                 pushi 1 addp
@@ -737,45 +750,109 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
                 pop
                 pushp loop jmp
 
+              :transition_to_ssr
+                pushui state_ssr write5
+                pushp continue_checking_ping jmp
+
               :check_ssr
-                pushc '\r' over loadc pushp inc_b5 jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp continue_checking_ping jmp
+
+              :transition_to_ssn
+                pushui state_ssn write5
                 pushp continue_checking_ping jmp
 
               :check_ssn
-                pushc '\n' over loadc pushp inc_b5 jeq
-                pushi 0 write5
+                pushc '\n' over loadc pushp transition_to_P_or_colon jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_P_or_colon
+                pushui state_P_or_colon write5
                 pushp continue_checking_ping jmp
 
-              :check_P
-                pushc 'P' over loadc pushp inc_b5 jeq
-                pushi 0 write5
+              :check_P_or_colon
+                pushc 'P' over loadc pushp transition_to_I jeq
+                pushc ':' over loadc pushp transition_to_prefix jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_prefix
+                pushui state_prefix write5
+                pushp continue_checking_ping jmp
+
+              :check_prefix
+                pushc ' ' over loadc pushp transition_to_atleastonespace jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_atleastonespace
+                pushui state_atleastonespace write5
+                pushp continue_checking_ping jmp
+
+              :check_atleastonespace
+                pushc ' ' over loadc pushp transition_to_optspacesequence jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_optspacesequence
+                pushui state_optspacesequence write5
+                pushp continue_checking_ping jmp
+
+              :check_optspacesequence
+                pushc ' ' over loadc pushp transition_to_optspacesequence jeq
+                pushc 'P' over loadc pushp transition_to_I jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_I
+                pushui state_I write5
                 pushp continue_checking_ping jmp
 
               :check_I
-                pushc 'I' over loadc pushp inc_b5 jeq
-                pushi 0 write5
-                pushp check_P jmp
+                pushc 'I' over loadc pushp transition_to_N jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_N
+                pushui state_N write5
+                pushp continue_checking_ping jmp
 
               :check_N
-                pushc 'N' over loadc pushp inc_b5 jeq
-                pushi 0 write5
-                pushp check_P jmp
+                pushc 'N' over loadc pushp transition_to_G jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_G
+                pushui state_G write5
+                pushp continue_checking_ping jmp
 
               :check_G
-                pushc 'G' over loadc pushp send_pong jeq
-                pushi 0 write5
-                pushp check_P jmp
+                pushc 'G' over loadc pushp transition_to_space jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
+
+              :transition_to_space
+                pushui state_space write5
+                pushp continue_checking_ping jmp
+
+              :check_space
+                pushc ' ' over loadc pushp send_pong jeq
+                pushc '\r' over loadc pushp transition_to_ssn jeq
+                pushp transition_to_ssr jmp
 
                 :send_pong
-                  pushi 6 write5
-
                   get2
-                  pushp "PONG"
-                  pushi 4
+                  pushp "PONG "
+                  pushi 5
                   pushp writef call
                   get0 pushi -1 pushp pong_send_err jeq
 
-                  pushp continue_checking_ping jmp
+                  pushp transition_to_esr jmp
+
+              :transition_to_esr
+                pushui state_esr write5
+                pushp continue_checking_ping jmp
 
               :check_esr
                 get2
@@ -784,13 +861,14 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
                 pushp writef call
                 get0 pushi -1 pushp pong_send_err jeq
 
-                pushc '\r' over loadc pushp inc_b5 jeq
+                pushc '\r' over loadc pushp transition_to_esn jeq
+                pushp continue_checking_ping jmp
 
+              :transition_to_esn
+                pushui state_esn write5
                 pushp continue_checking_ping jmp
 
               :check_esn
-                pushi 6 write5
-
                 get2
                 over
                 pushi 1
@@ -798,9 +876,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
                 get0 pushi -1 pushp pong_send_err jeq
 
                 pushc '\n' over loadc pushp end_pong_msg jeq
-
-               pushp continue_checking_ping jmp
+                pushp transition_to_esr jmp
 
                 :end_pong_msg
-                  pushi 2 write5
-                  pushp continue_checking_ping jmp
+                  pushp transition_to_P_or_colon jmp
