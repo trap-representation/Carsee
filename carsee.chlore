@@ -586,7 +586,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
                                                            ;messages to respond to "PING"s
 
-    pushi -1 write6                                        ;offset into the at'd name; used during atname check
+    pushi -1 write6                                        ;offset into the set atname; used during atname check
 
     pushui 0 write7                                        ;if it's set to a non-zero value, the socket is no
                                                            ;longer accessible
