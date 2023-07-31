@@ -255,7 +255,6 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-
 :test_reply_err
   pushp "\ncarsee (error): failed to reply to test\n"
   pushp putstre call
