@@ -743,6 +743,7 @@ carsee (info): /hold (i): pauses all operations until at least one character is 
 carsee (info): /cconnect: connects to a (possibly different) server\n\
 carsee (info): /test: replies with a \"passed\" message\n\
 carsee (info): /status: displays the connection status of the server\n\
+carsee (info): /setatname: set your atname for this session\n\
 carsee (info): /help: displays this help message\n\
 carsee (info): ---\n\
 carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
