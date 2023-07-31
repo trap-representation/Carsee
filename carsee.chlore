@@ -712,6 +712,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             :atname_contains_at
               pushp "\ncarsee (error): atname cannot contain the symbol '@'\n"
               pushp putstre call
+              pushc '\0' over storec
               get7 pushp read_input_source jnz
               pushp loop jmp
 
