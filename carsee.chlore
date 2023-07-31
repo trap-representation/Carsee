@@ -678,9 +678,18 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           dup pushp "/help" pushp strcmp call pushp help jz
           dup pushp "/status" pushp strcmp call pushp status jz
           dup pushp "/setatname" pushp strcmp call pushp setatname jz
+          dup pushp "/getatname" pushp strcmp call pushp getatname jz
           get7 pushp read_input_source jnz
           dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
+
+          :getatname
+            over
+            pushp "\ncarsee (info): atname set to '%t'\n"
+            pushp putfmte call
+
+            get7 pushp read_input_source jnz
+            pushp loop jmp
 
           :setatname
             pushp "\ncarsee (info): atname\n"
@@ -712,7 +721,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             :atname_contains_at
               pushp "\ncarsee (error): atname cannot contain the symbol '@'\n"
               pushp putstre call
-              pushc '\0' over storec
+              over pushc '\0' swap storec
               get7 pushp read_input_source jnz
               pushp loop jmp
 
@@ -745,6 +754,7 @@ carsee (info): /cconnect: connects to a (possibly different) server\n\
 carsee (info): /test: replies with a \"passed\" message\n\
 carsee (info): /status: displays the connection status of the server\n\
 carsee (info): /setatname: set your atname for this session\n\
+carsee (info): /getatname: check the set atname for this session \n\
 carsee (info): /help: displays this help message\n\
 carsee (info): ---\n\
 carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
