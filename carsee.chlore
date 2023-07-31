@@ -697,20 +697,20 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
             pushp trunc_atname_err jnz
 
             over
-            pushp "\ncarsee (info): atname set to '%t'\n"
-            pushp putfmte call
-
-            over
             pushc '@'
             swap
             pushp chrstr call
             pushi -1 pushp atname_contains_at jne
 
+            over
+            pushp "\ncarsee (info): atname set to '%t'\n"
+            pushp putfmte call
+
             get7 pushp read_input_source jnz
             pushp loop jmp
 
             :atname_contains_at
-              pushp "\ncarsee (info): atname cannot contain the symbol '@'\n"
+              pushp "\ncarsee (error): atname cannot contain the symbol '@'\n"
               pushp putstre call
               get7 pushp read_input_source jnz
               pushp loop jmp
