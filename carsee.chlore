@@ -870,13 +870,21 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
                   :atname_onematch
                     pushui 1 get6 addl write6
-                    write0 over get0 swap get6 addp loadc pushp allmatch_atname jz
+                    write0 over get0 swap get6 addp loadc pushp allmatch_atname_maybe jz
                     pushp continue_checking jmp
 
-                    :allmatch_atname
-                      pushp "\a" pushp putstre call
-                      pushi -1 write6
+                    :allmatch_atname_maybe
+                      pushc ' ' over lodac pushp allmat_atname jeq
+                      pushc '\f' over lodac pushp allmat_atname jeq
+                      pushc '\r' over lodac pushp allmat_atname jeq
+                      pushc '\t' over lodac pushp allmat_atname jeq
+                      pushc '\v' over lodac pushp allmat_atname jeq
                       pushp continue_checking jmp
+
+                      :allmatch_atname
+                        pushp "\a" pushp putstre call
+                        pushi -1 write6
+                        pushp continue_checking jmp
 
                   :atname_notmatch
                     pushi -1 write6
