@@ -874,11 +874,11 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
                     pushp continue_checking jmp
 
                     :allmatch_atname_maybe
-                      pushc ' ' over loadc pushp allmat_atname jeq
-                      pushc '\f' over loadc pushp allmat_atname jeq
-                      pushc '\r' over loadc pushp allmat_atname jeq
-                      pushc '\t' over loadc pushp allmat_atname jeq
-                      pushc '\v' over loadc pushp allmat_atname jeq
+                      pushc ' ' over loadc pushp allmatch_atname jeq
+                      pushc '\f' over loadc pushp allmatch_atname jeq
+                      pushc '\r' over loadc pushp allmatch_atname jeq
+                      pushc '\t' over loadc pushp allmatch_atname jeq
+                      pushc '\v' over loadc pushp allmatch_atname jeq
                       pushp continue_checking jmp
 
                       :allmatch_atname
