@@ -339,9 +339,9 @@ import "exit.chloreh"
   pushp putstre call
   pushp flush call
   pushp flush call
-  pushp phclean call
   get2 pushp closef call
   get3 pushp watch_close call
+  pushp phclean call
   hlt
 
 set MSG_LEN 512
