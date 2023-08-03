@@ -202,7 +202,7 @@ import "exit.chloreh"
   pushp phclean call
   pushi 1 hltr
 
-:atdname_alloc_err
+:atname_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
   get2 pushp closef call
@@ -212,6 +212,7 @@ import "exit.chloreh"
 :msg_alloc_err
   pushp "\ncarsee (error): failed to allocate enough memory\n"
   pushp putstre call
+  pop
   pushp flush call
   get2 pushp closef call
   pushp phclean call
@@ -248,6 +249,36 @@ import "exit.chloreh"
   pushi 1 hltr
 
 :trunc_climsg_err
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
+:help_display_err
+  pushp "\ncarsee (error): failed to display help of connection\n"
+  pushp putstre call
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
+:unread_display_err
+  pushp "\ncarsee (error): failed to display the number of unread atname instances\n"
+  pushp putstre call
+  pushp flush call
+  pushp flush call
+  get2 pushp closef call
+  get3 pushp watch_close call
+  pushp phclean call
+  pushi 1 hltr
+
+:status_display_err
+  pushp "\ncarsee (error): failed to display status of connection\n"
+  pushp putstre call
   pushp flush call
   pushp flush call
   get2 pushp closef call
@@ -586,15 +617,17 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
                                                            ;messages to respond to "PING"s
 
-    pushi -1 write6                                        ;offset into the set atname; used during atname check
+    pushi -1 write6                                        ;offset into the atname buffer; used during atname check
 
     pushui 0 write7                                        ;if it's set to a non-zero value, the socket is no
                                                            ;longer accessible
 
+    pushui 0                                               ;this is the number of unread instances of the set atname
+
     pushui 0                                               ;if it's set to a non-zero value, the output is "held"
 
     pushl MSG_LEN1 pushp aseg call
-    get0 pushp atdname_alloc_err jnz
+    get0 pushp atname_alloc_err jnz
 
     pushc '\0' over storec
 
@@ -604,6 +637,22 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushp watch_new call
     dup pushi -1 pushp creat_watch_err jeq
     write3                                                 ;save the wd in block 3
+
+
+    set MAX_UINSTS 3
+
+    set state_ssr 0
+    set state_ssn 1
+    set state_P_or_colon 2
+    set state_prefix 3
+    set state_atleastonespace 4
+    set state_optspacesequence 5
+    set state_I 6
+    set state_N 7
+    set state_G 8
+    set state_space 9
+    set state_esr 10
+    set state_esn 11
 
     :loop
       write0
@@ -678,9 +727,47 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
           dup pushp "/status" pushp strcmp call pushp status jz
           dup pushp "/setatname" pushp strcmp call pushp setatname jz
           dup pushp "/getatname" pushp strcmp call pushp getatname jz
+          dup pushp "/unread" pushp strcmp call pushp unread_atname_insts jz
+          dup pushp "/read" pushp strcmp call pushp read_atname_insts jz
           get7 pushp read_input_source jnz
           dup pushp "/hold" pushp strcmp call pushp hold jz
           pushp continue_to_preview jmp
+
+          :read_atname_insts
+            write0
+            write1
+            swap pop pushui 0 swap
+            get1
+            get0
+            get7 pushp read_input_source jnz
+            pushp loop jmp
+
+          :unread_atname_insts
+            ;stack state: inst held atname msg
+            write0
+            write1
+            over
+            get1 swap
+            get0 swap
+
+            dup pushui MAX_UINSTS pushp less_than_max_uinsts jge
+            pushp more_than_max_uinsts jmp
+
+            :more_than_max_uinsts
+              pop
+              pushui MAX_UINSTS
+              pushp "\ncarsee(info): %ui+ unread atname instances\n"
+              pushp putfmte call
+              get0 pushi EOF pushp unread_display_err jeq
+              get7 pushp read_input_source jnz
+              pushp loop jmp
+
+            :less_than_max_uinsts
+              pushp "\ncarsee(info): %ui atname instances\n"
+              pushp putfmte call
+              get0 pushi EOF pushp unread_display_err jeq
+              get7 pushp read_input_source jnz
+              pushp loop jmp
 
           :getatname
             over
@@ -730,11 +817,13 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
             :status_not_connected
               pushp "\ncarsee (info): server has closed connection\n"
+              get0 pushi EOF pushp status_display_err jeq
               pushp putstre call
               pushp read_input_source jmp
 
             :status_connected
               pushp "\ncarsee (info): server has NOT closed connection\n"
+              get0 pushi EOF pushp status_display_err jeq
               pushp putstre call
               pushp loop jmp
 
@@ -753,11 +842,14 @@ carsee (info): /cconnect: connects to a (possibly different) server\n\
 carsee (info): /test: replies with a \"passed\" message\n\
 carsee (info): /status: displays the connection status of the server\n\
 carsee (info): /setatname: set your atname for this session\n\
-carsee (info): /getatname: check the set atname for this session \n\
+carsee (info): /getatname: check the set atname for this session\n\
+carsee (info): /unread: display then number of unread atname instances\n\
+carsee (info): /read: reset the unread atname instance counter to zero\n\
 carsee (info): /help: displays this help message\n\
 carsee (info): ---\n\
 carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
             pushp putstre call
+            get0 pushi EOF pushp help_display_err jeq
             pushp loop jmp
 
           :idc_connect_serv
@@ -829,19 +921,6 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
             dup
 
-            set state_ssr 0
-            set state_ssn 1
-            set state_P_or_colon 2
-            set state_prefix 3
-            set state_atleastonespace 4
-            set state_optspacesequence 5
-            set state_I 6
-            set state_N 7
-            set state_G 8
-            set state_space 9
-            set state_esr 10
-            set state_esn 11
-
             :check_ping_and_atname
               get5 pushui state_ssr pushp check_ssr jeq
               get5 pushui state_ssn pushp check_ssn jeq
@@ -877,8 +956,19 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
                     :allmatch_atname
                       pushp "\a" pushp putstre call
-                      pushi -1 write6
-                      pushp continue_checking jmp
+                      pushsp pushui 5 swap subl copy
+                      dup pushui MAX_UINSTS pushp inc_inst_count jge
+                      pushp continue_noinc_inst jmp
+
+                      :inc_inst_count
+                        pushui 1 addui pushsp pushui 6 swap subl put
+                        pushi -1 write6
+                        pushp continue_checking jmp
+
+                      :continue_noinc_inst
+                        pop
+                        pushi -1 write6
+                        pushp continue_checking jmp
 
                   :atname_onematch
                     pushui 1 get6 addl write6
