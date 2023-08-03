@@ -639,7 +639,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     write3                                                 ;save the wd in block 3
 
 
-    set MAX_UINSTS 3
+    set MAX_UINSTS 99
 
     set state_ssr 0
     set state_ssn 1
