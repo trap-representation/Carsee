@@ -763,7 +763,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
               pushp loop jmp
 
             :less_than_max_uinsts
-              pushp "\ncarsee(info): %ui atname instances\n"
+              pushp "\ncarsee(info): %ui unread atname instances\n"
               pushp putfmte call
               get0 pushi EOF pushp unread_display_err jeq
               get7 pushp read_input_source jnz
