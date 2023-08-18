@@ -383,25 +383,14 @@ set MSG_LEN2 510
                                                            ;from the input source if they're > 510 bytes
                                                            ;it also replaces the newline (if any) at the
                                                            ;end of the source buffer with a null terminator
-  ;stack state: buf size return
-  swap write0
-  swap
-  get0
+  ;stack state: buf size
   addp
   dup loadc pushc '\n' pushp skip_consume jeq
   pushp init_loop_consume jmp
 
-  :zerosize_buf
-    swap pop
-    swap pop
-    pushi 0
-    swap
-    ret
-
   :skip_consume
     pushc '\0' swap storec
     pushi 0
-    swap
     ret
 
   :init_loop_consume
@@ -419,7 +408,6 @@ set MSG_LEN2 510
         pushp putstre call
         pop
         pushi 0
-        swap
         ret
 
       :end_consume_err
@@ -427,7 +415,6 @@ set MSG_LEN2 510
         pushp putstre call
         pop
         pushi 1
-        swap
         ret
 
 :main
@@ -622,7 +609,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
     pushui 0 write7                                        ;if it's set to a non-zero value, the socket is no
                                                            ;longer accessible
 
-    pushui 0                                               ;this is the number of unread instances of the set atname
+    pushui 0 write1                                        ;this is the number of unread instances of the set atname
 
     pushui 0                                               ;if it's set to a non-zero value, the output is "held"
 
@@ -744,11 +731,7 @@ carsee (info): along with this program.  If not, see <https://www.gnu.org/licens
 
           :unread_atname_insts
             ;stack state: inst held atname msg
-            write0
-            write1
-            over
-            get1 swap
-            get0 swap
+            get1
 
             dup pushui MAX_UINSTS pushp less_than_max_uinsts jge
             pushp more_than_max_uinsts jmp
@@ -956,12 +939,12 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
 
                     :allmatch_atname
                       pushp "\a" pushp putstre call
-                      pushsp pushui 5 swap subl copy
+                      get1
                       dup pushui MAX_UINSTS pushp inc_inst_count jge
                       pushp continue_noinc_inst jmp
 
                       :inc_inst_count
-                        pushui 1 addui pushsp pushui 6 swap subl put
+                        pushui 1 addui write1
                         pushi -1 write6
                         pushp continue_checking jmp
 
