@@ -23,399 +23,1214 @@ import "string.chloreh"
 import "watch.chloreh"
 import "exit.chloreh"
 
-:nickname_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_nickname_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_nickname_err
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:pass_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_pass_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_pass_err
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:username_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_username_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_username_err
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:creat_socket_err
-  pushp "\ncarsee (error): failed to create socket\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:host_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pop
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_host_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_host_err
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:port_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_port_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_port_err
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:connect_err
-  pushp "\ncarsee (error): failed to connect\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:pass_send_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:nick_send_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  get2 pushp closef call
-  pushp flush call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:user_send_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  get2 pushp closef call
-  pushp flush call
-  pushp phclean call
-  pushi 1 hltr
-
-:atname_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  get2 pushp closef call
-  pushp phclean call
-  pushi 1 hltr
-
-:msg_alloc_err
-  pushp "\ncarsee (error): failed to allocate enough memory\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  get2 pushp closef call
-  pushp phclean call
-  pushi 1 hltr
-
-:creat_watch_err
-  pushp "\ncarsee (error): failed to create watch\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  pushp phclean call
-  pushi 1 hltr
-
-:watch_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:climsg_read_err
-  pushp "\ncarsee (error): failed to read from input source\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_climsg_err
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:help_display_err
-  pushp "\ncarsee (error): failed to display help of connection\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:unread_display_err
-  pushp "\ncarsee (error): failed to display the number of unread atname instances\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:status_display_err
-  pushp "\ncarsee (error): failed to display status of connection\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:test_reply_err
-  pushp "\ncarsee (error): failed to reply to test\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:climsg_preview_err
-  pushp "\ncarsee (error): failed to display message preview\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:climsg_send_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:recv_serv_err
-  pushp "\ncarsee (error): failed to receive message from server\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:servmsg_write_err
-  pushp "\ncarsee (error): failed to display servent-sent message\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:read_atname_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:trunc_atname_err
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:pong_send_err
-  pushp "\ncarsee (error): failed to send message to server\n"
-  pushp putstre call
-  pop
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  pushi 1 hltr
-
-:quit
-  pushp "\ncarsee (info): quitting\n"
-  pushp putstre call
-  pushp flush call
-  pushp flush call
-  get2 pushp closef call
-  get3 pushp watch_close call
-  pushp phclean call
-  hlt
-
 set MSG_LEN 512
 set MSG_LEN1 511
 set MSG_LEN2 510
 
-:consume_input_if_too_large                                ;this subroutine truncates messages received
-                                                           ;from the input source if they're > 510 bytes
-                                                           ;it also replaces the newline (if any) at the
-                                                           ;end of the source buffer with a null terminator
+:consume_till_end
+  if(pushp getchar call dup pushi EOF eq){
+    pushp "\ncarsee (info): message truncated\n"
+    pushp putstre call
+    pop
+    pushi 0
+    ret
+  }
+  else if(dup pushc '\n' eq){
+    pushp "\ncarsee (info): message truncated\n"
+    pushp putstre call
+    pop
+    pushi 0
+    ret
+  }
+  else if(pushi 0 gt){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pop
+    pushi 1
+    ret
+  }
+  pushp consume_till_end rcall
+
+:consume_input_if_too_large ;this subroutine truncates messages received
+                            ;from the input source if they're > 510 bytes
+                            ;it also replaces the newline (if any) at the
+                            ;end of the source buffer with a null terminator
   ;stack state: buf size
   addp
-  dup loadc pushc '\n' pushp skip_consume jeq
-  pushp init_loop_consume jmp
-
-  :skip_consume
+  if(dup loadc pushc '\n' eq){
     pushc '\0' swap storec
     pushi 0
     ret
+  }
 
-  :init_loop_consume
+  pushp consume_till_end call
+  ret
+
+:transition_to_ssr
+  pushui state_ssr write5
+  ret
+
+:check_ssr
+  if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  ret
+
+:transition_to_ssn
+  pushui state_ssn write5
+  ret
+
+:check_ssn
+  if(pushc '\n' over loadc eq){
+    pushp transition_to_P_or_colon call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_P_or_colon
+  pushui state_P_or_colon write5
+  ret
+
+:check_P_or_colon
+  if(pushc 'P' over loadc eq){
+    pushp transition_to_I call
+  }
+  else if(pushc ':' over loadc eq){
+    pushp transition_to_prefix call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_prefix
+  pushui state_prefix write5
+  ret
+
+:check_prefix
+  if(pushc ' ' over loadc eq){
+    pushp transition_to_atleastonespace call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_atleastonespace
+  pushui state_atleastonespace write5
+  ret
+
+:check_atleastonespace
+  if(pushc ' ' over loadc eq){
+    pushp transition_to_optspacesequence call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_optspacesequence
+  pushui state_optspacesequence write5
+  ret
+
+:check_optspacesequence
+  if(pushc ' ' over loadc eq){
+    pushp transition_to_optspacesequence call
+  }
+  else if(pushc 'P' over loadc eq){
+    pushp transition_to_I call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_I
+  pushui state_I write5
+  ret
+
+:check_I
+  if(pushc 'I' over loadc eq){
+    pushp transition_to_N call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_N
+  pushui state_N write5
+  ret
+
+:check_N
+  if(pushc 'N' over loadc eq){
+    pushp transition_to_G call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_G
+  pushui state_G write5
+  ret
+
+:check_G
+  if(pushc 'G' over loadc eq){
+    pushp transition_to_space call
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  ret
+
+:transition_to_space
+  pushui state_space write5
+  ret
+
+:check_space
+  if(pushc ' ' over loadc eq){
+    if(pushp send_pong call nz){
+      pushi 1
+      ret
+    }
+  }
+  else if(pushc '\r' over loadc eq){
+    pushp transition_to_ssn call
+  }
+  else{
+    pushp transition_to_ssr call
+  }
+  pushi 0
+  ret
+
+:send_pong
+  get2
+  pushp "PONG "
+  pushui 5
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
     pop
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
 
-    :loop_consume
-      pushp getchar call
-      dup pushi EOF pushp end_consume jeq
-      dup pushc '\n' pushp end_consume jeq
-      pushi 0 pushp end_consume_err jgt
-      pushp loop_consume jmp
+  pushp transition_to_esr call
+  pushi 0 ret
 
-      :end_consume
-        pushp "\ncarsee (info): message truncated\n"
-        pushp putstre call
+:transition_to_esr
+  pushui state_esr write5
+  ret
+
+:check_esr
+  get2
+  over
+  pushui 1
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+
+  if(pushc '\r' over loadc eq){
+    pushp transition_to_esn call
+  }
+  pushi 0
+  ret
+
+:transition_to_esn
+  pushui state_esn write5
+  ret
+
+:check_esn
+  get2
+  over
+  pushui 1
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+
+  if(pushc '\n' over loadc eq){
+    pushp end_pong_msg call
+  }
+  else{
+    pushp transition_to_esr call
+  }
+  pushi 0
+  ret
+
+:end_pong_msg
+  pushp transition_to_P_or_colon call
+  ret
+
+:check_atname
+  if(write0 over get0 swap loadc zr){
+    pushui 1 addp
+    if(pushui 1 get4 subl dup write4 nz){
+      pushp check_ping_and_atname rcall
+    }
+    else{
+      pop
+      pushp main_loop rcall
+    }
+  }
+  else if(pushc '@' over loadc eq){
+    pushui 0 write6
+    pushui 1 addp
+    if(pushui 1 get4 subl dup write4 nz){
+      pushp check_ping_and_atname rcall
+    }
+    else{
+      pop
+      pushp main_loop rcall
+    }
+  }
+  else if(pushi -1 get6 gt){
+    if(write0 over get0 swap get6 addp loadc zr){
+      if(pushc ' ' over loadc eq nz write0
+         pushc '\f' over loadc eq nz get0 addui write0
+         pushc '\r' over loadc eq nz get0 addui write0
+         pushc '\t' over loadc eq nz get0 addui write0
+         pushc '\v' over loadc eq nz get0 addui write0
+         get0
+      ){
+         pushc '\a' pushp putchare call
+         get1
+         if(dup pushui MAX_UINSTS ge){
+           pushui 1 addui write1
+           pushi -1 write6
+           pushui 1 addp
+           if(pushui 1 get4 subl dup write4 nz){
+             pushp check_ping_and_atname rcall
+           }
+           else{
+             pop
+             pushp main_loop rcall
+           }
+         }
+         else{
+           pop
+           pushi -1 write6
+           pushui 1 addp
+           if(pushui 1 get4 subl dup write4 nz){
+             pushp check_ping_and_atname rcall
+           }
+           else{
+             pop
+             pushp main_loop rcall
+           }
+         }
+      }
+      else{
+        pushi -1 write6
+        pushui 1 addp
+        if(pushui 1 get4 subl dup write4 nz){
+          pushp check_ping_and_atname rcall
+        }
+        else{
+          pop
+          pushp main_loop rcall
+        }
+      }
+    }
+    else if(write0 over get0 swap get6 addp loadc over loadc eq){
+      pushui 1 get6 addl write6
+      pushui 1 addp
+      if(pushui 1 get4 subl dup write4 nz){
+        pushp check_ping_and_atname rcall
+      }
+      else{
         pop
-        pushi 0
-        ret
-
-      :end_consume_err
-        pushp "\ncarsee (error): failed to read from input source\n"
-        pushp putstre call
+        pushp main_loop rcall
+      }
+    }
+    else{
+      pushi -1 write6
+      pushui 1 addp
+      if(pushui 1 get4 subl dup write4 nz){
+        pushp check_ping_and_atname rcall
+      }
+      else{
         pop
-        pushi 1
-        ret
+        pushp main_loop rcall
+      }
+    }
+  }
+  else{
+    pushui 1 addp
+    if(pushui 1 get4 subl dup write4 nz){
+      pushp check_ping_and_atname rcall
+    }
+    else{
+      pop
+      pushp main_loop rcall
+    }
+  }
+
+:check_ping_and_atname
+  if(get5 pushui state_ssr eq){
+    pushp check_ssr call
+  }
+  else if(get5 pushui state_ssn eq){
+    pushp check_ssn call
+  }
+  else if(get5 pushui state_P_or_colon eq){
+    pushp check_P_or_colon call
+  }
+  else if(get5 pushui state_prefix eq){
+    pushp check_prefix call
+  }
+  else if(get5 pushui state_atleastonespace eq){
+    pushp check_atleastonespace call
+  }
+  else if(get5 pushui state_optspacesequence eq){
+    pushp check_optspacesequence call
+  }
+  else if(get5 pushui state_I eq){
+    pushp check_I call
+  }
+  else if(get5 pushui state_N eq){
+    pushp check_N call
+  }
+  else if(get5 pushui state_G eq){
+    pushp check_G call
+  }
+  else if(get5 pushui state_space eq){
+    if(pushp check_space call nz){
+      pushi 1
+      ret
+    }
+  }
+  else if(get5 pushui state_esr eq){
+    if(pushp check_esr call nz){
+      pushi 1
+      ret
+    }
+  }
+  else if(get5 pushui state_esn eq){
+    if(pushp check_esn call nz){
+      pushi 1
+      ret
+    }
+  }
+  pushp check_atname rcall
+
+:recv_server
+  get2
+  over ;allocated chunk
+  pushl MSG_LEN
+  if(pushp readf call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to receive message from server\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+  get0 write4
+
+  if(get4 zr){
+    pushp "\ncarsee (info): server closed connection\n"
+    pushp putstre call
+    pushui 1 write7
+    pushp read_input_source rcall
+  }
+
+  pushi STDERR
+  over
+  get4
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to display servent-sent message\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+
+  dup
+  pushp check_ping_and_atname rcall
+
+:read_input_source
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+  get0 write4 ;length of message
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+
+  if(get4 get7 addi zr){
+    pushp main_loop rcall
+  }
+  else if(dup pushp "/quit" pushp strcmp call zr){
+    pushi 0 ret
+  }
+  else if(dup pushp "/cconnect" pushp strcmp call zr){
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    if(pushp est_connection call nz){
+      pushi 1 ret
+    }
+    pushp main_loop rcall
+  }
+  else if(dup pushp "/test" pushp strcmp call zr){
+    pushp "\ncarsee (info): passed\n"
+    if(pushp putstre call get0 pushi EOF eq){
+      pushp "\ncarsee (error): failed to reply to test\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    if(get7 nz){
+      pushp read_input_source rcall
+    }
+    else{
+      pushp main_loop rcall
+    }
+  }
+  else if(dup pushp "/help" pushp strcmp call zr){
+    pushp "\n\
+carsee (info): /quit: close client\n\
+carsee (info): /hold (i): pauses all operations until at least one character is received from the input source\n\
+carsee (info): /cconnect: connects to a (possibly different) server\n\
+carsee (info): /test: replies with a \"passed\" message\n\
+carsee (info): /status: displays the connection status of the server\n\
+carsee (info): /setatname: sets your atname for this session\n\
+carsee (info): /getatname: displays the set atname for this session\n\
+carsee (info): /unread: displays the number of unread atname instances\n\
+carsee (info): /read: resets the unread atname instance counter\n\
+carsee (info): /help: displays this help message\n\
+carsee (info): ---\n\
+carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
+    if(pushp putstre call get0 pushi EOF eq){
+      pushp "\ncarsee (error): failed to display help of connection\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+  }
+  else if(dup pushp "/status" pushp strcmp call zr){
+    if(get7 zr){
+      pushp "\ncarsee (info): server has NOT closed connection\n"
+      if(pushp putstre call get0 pushi EOF eq){
+        pushp "\ncarsee (error): failed to display status of connection\n"
+        pushp putstre call
+        pushp flush call
+        pushp flush call
+        get2 pushp closef call
+        get3 pushp watch_close call
+        pushi 1 ret
+      }
+      pushp main_loop rcall
+    }
+    else{
+      pushp "\ncarsee (info): server has closed connection\n"
+      if(pushp putstre call get0 pushi EOF eq){
+        pushp "\ncarsee (error): failed to display status of connection\n"
+        pushp putstre call
+        pushp flush call
+        pushp flush call
+        get2 pushp closef call
+        get3 pushp watch_close call
+        pushi 1 ret
+      }
+      pushp read_input_source rcall
+    }
+  }
+  else if(dup pushp "/setatname" pushp strcmp call zr){
+    pushp "\ncarsee (info): atname\n"
+    pushp putstre call
+
+    over
+
+    pushl MSG_LEN2
+    swap
+    if(pushp getstr call get0 pushi EOF eq){
+      pushp "\ncarsee (error): failed to send message to server\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+
+    over get0
+    if(pushp consume_input_if_too_large call nz){
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+
+    over
+    pushc '@'
+    swap
+    if(pushp chrstr call pushi -1 ne){
+      pushp "\ncarsee (error): atname cannot contain the symbol '@'\n"
+      pushp putstre call
+      over pushc '\0' swap storec
+      if(get7 nz){
+        pushp read_input_source rcall
+      }
+      else{
+        pushp main_loop rcall
+      }
+    }
+    else{
+      over
+      pushp "\ncarsee (info): atname set to '%t'\n"
+      pushp putfmte call
+
+      if(get7 nz){
+        pushp read_input_source rcall
+      }
+      else{
+        pushp main_loop rcall
+      }
+    }
+  }
+  else if(dup pushp "/getatname" pushp strcmp call zr){
+    over
+    pushp "\ncarsee (info): atname set to '%t'\n"
+    pushp putfmte call
+
+    if(get7 nz){
+      pushp read_input_source rcall
+    }
+    else{
+      pushp main_loop rcall
+    }
+  }
+  else if(dup pushp "/unread" pushp strcmp call zr){
+    if(get1 pushui MAX_UINSTS ge){
+      get1 pushp "\ncarsee(info): %ui unread atname instances\n"
+      if(pushp putfmte call get0 pushi EOF eq){
+        pushp "\ncarsee (error): failed to display the number of unread atname instances\n"
+        pushp putstre call
+        pushp flush call
+        pushp flush call
+        get2 pushp closef call
+        get3 pushp watch_close call
+        pushi 1 ret
+      }
+      if(get7 nz){
+        pushp read_input_source rcall
+      }
+      else{
+        pushp main_loop rcall
+      }
+    }
+    else{
+      pushui MAX_UINSTS
+      pushp "\ncarsee(info): %ui+ unread atname instances\n"
+      if(pushp putfmte call get0 pushi EOF eq){
+        pushp "\ncarsee (error): failed to display the number of unread atname instances\n"
+        pushp putstre call
+        pushp flush call
+        pushp flush call
+        get2 pushp closef call
+        get3 pushp watch_close call
+        pushi 1 ret
+      }
+      if(get7 nz){
+        pushp read_input_source rcall
+      }
+      else{
+        pushp main_loop rcall
+      }
+    }
+  }
+  else if(dup pushp "/read" pushp strcmp call zr){
+    pushui 0 write1
+    if(get7 nz){
+      pushp read_input_source rcall
+    }
+    else{
+      pushp main_loop rcall
+    }
+  }
+  else if(get7 nz){
+    pushp read_input_source rcall
+  }
+  else if(dup pushp "/hold" pushp strcmp call zr){
+    pushp "\ncarsee (info): held\n" pushp putstre call
+    write0
+    swap
+    pop
+    pushui 1
+    swap
+    get0
+    pushp read_input_source rcall
+  }
+  else{
+    pushp "\ncarsee (preview): "
+    if(pushp putstre call get0 pushi EOF eq){
+      pushp "\ncarsee (error): failed to display message preview\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    pushi STDERR
+    over
+    get4 ;message length
+    if(pushp writef call get0 pushi -1 eq){
+      pushp "\ncarsee (error): failed to display message preview\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    pushc '\n'
+    if(pushp putchare call get0 pushi EOF eq){
+      pushp "\ncarsee (error): failed to display message preview\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    get2
+    over
+    get4 ;message length
+    if(pushp writef call get0 pushi -1 eq){
+      pushp "\ncarsee (error): failed to send message to server\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    get2
+    pushp "\r\n"
+    pushui 2
+    if(pushp writef call get0 pushi -1 eq){
+      pushp "\ncarsee (error): failed to send message to server\n"
+      pushp putstre call
+      pushp flush call
+      pushp flush call
+      get2 pushp closef call
+      get3 pushp watch_close call
+      pushi 1 ret
+    }
+    pushp main_loop rcall
+  }
+
+:main_loop
+  set MAX_UINSTS 99
+
+  set state_ssr 0
+  set state_ssn 1
+  set state_P_or_colon 2
+  set state_prefix 3
+  set state_atleastonespace 4
+  set state_optspacesequence 5
+  set state_I 6
+  set state_N 7
+  set state_G 8
+  set state_space 9
+  set state_esr 10
+  set state_esn 11
+
+  if(write0 over get0 swap nz){
+    pushp "\ncarsee (info): unheld\n" pushp putstre call
+    write0
+    swap
+    pop
+    pushui 0
+    swap
+    get0
+  }
+
+  get3
+  pushi READFD
+  pushp fd_zero call
+
+  pushi STDIN
+  get3
+  pushi READFD
+  pushp fd_set call
+
+  get2
+  get3
+  pushi READFD
+  pushp fd_set call
+
+  get3
+  pushi 0
+  pushi -1
+  pushi -1
+  get2 pushi 1 addi
+  if(pushp watch call get0 pushi -1 eq){
+    pushp "\ncarsee (error): watch error\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    get3 pushp watch_close call
+    pushi 1 ret
+  }
+
+  get2
+  get3
+  pushi READFD
+  if(pushp fd_isset call nz){
+    pushp recv_server rcall
+  }
+
+  pushi STDIN
+  get3
+  pushi READFD
+  if(pushp fd_isset call nz){
+    pushp read_input_source rcall
+  }
+
+:est_connection
+  pushp "\ncarsee (info): nickname\n"
+  pushp putstre call
+
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){ ;chunk to store the username
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pushi 1 ret
+  }
+
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+  pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    pushi 1 ret
+  }
+  get0 write3 ;length of nickname
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp "\ncarsee (info): password\n"
+  pushp putstre call
+
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){ ;chunk to store the password
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+  get0 write4 ;length of password
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp "\ncarsee (info): username\n"
+  pushp putstre call
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){ ;chunk to store the username
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+  get0 write5 ;length of username
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushi AF_INET
+  pushi SOCK_STREAM
+  pushi 0
+  if(pushp socket call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to create socket\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  write2 ;save the sd in block 2
+
+  pushp "\ncarsee (info): host\n"
+  pushp putstre call
+
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){ ;chunk to store the host
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pop
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp "\ncarsee (info): port\n"
+  pushp putstre call
+
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){ ;chunk to store the port
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushl MSG_LEN2
+  over
+  if(pushp getstr call get0 pushi EOF eq){
+    pushp "\ncarsee (error): failed to read from input source\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  dup get0
+  if(pushp consume_input_if_too_large call nz){
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  over
+  over
+  swap
+  pushi AF_INET
+  pushi SOCK_STREAM
+  pushi 0
+  pushi 0
+  get2
+  if(pushp connect call get0 nz){
+    pushp "\ncarsee (error): failed to connect\n"
+    pushp putstre call
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp "\ncarsee (info): connection successful\n" pushp putstre call
+
+  pushp flush call
+  pushp flush call
+
+  ;stack state: nickname password username
+  swap
+
+  get2
+  pushp "PASS "
+  pushui 5
+  if(pushp writef call get0 pushi -1 eq){ ;write to socket
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  over
+  get4
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  pushp "\r\n"
+  pushui 2
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp flush call
+
+  swap
+
+  get2
+  pushp "NICK "
+  pushui 5
+  if(pushp writef call get0 pushi -1 eq){ ;write to socket
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+     get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  over
+  get3
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  pushp "\r\n"
+  pushui 2
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp flush call
+
+  get2
+  pushp "USER "
+  pushui 5
+  if(pushp writef call get0 pushi -1 eq){ ;write to socket
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  over
+  get5
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  get2
+  pushp "\r\n"
+  pushui 2
+  if(pushp writef call get0 pushi -1 eq){
+    pushp "\ncarsee (error): failed to send message to server\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushp flush call
+    pushi 1 ret
+  }
+
+  pushp flush call
+
+
+  pushui state_P_or_colon write5 ;used for the state machine implemented for parsing
+                                 ;messages to respond to "PING"s
+
+  pushi -1 write6 ;offset into the atname buffer; used during atname check
+
+  pushui 0 write7 ;if it's set to a non-zero value, the socket is no
+                  ;longer accessible
+
+  pushui 0 write1 ;this is the number of unread instances of the set atname
+
+  pushui 0 ;if it's set to a non-zero value, the output is "held"
+
+  pushl MSG_LEN1
+  if(pushp aseg call get0 nz){
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    get2 pushp closef call
+    pushi 1 ret
+  }
+
+  pushc '\0' over storec
+
+  pushl MSG_LEN
+  if(pushp aseg call get0 nz){
+    pushp "\ncarsee (error): failed to allocate enough memory\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    get2 pushp closef call
+    pushi 1 ret
+  }
+
+  if(pushp watch_new call dup pushi -1 eq){
+    pushp "\ncarsee (error): failed to create watch\n"
+    pushp putstre call
+    pop
+    pushp flush call
+    pushp flush call
+    get2 pushp closef call
+    pushi 1 ret
+  }
+  write3 ;save the wd in block 3
+  pushi 0
+  ret
 
 :main
   pushp "\
@@ -436,669 +1251,13 @@ carsee (info): You should have received a copy of the GNU General Public License
 carsee (info): along with this program.  If not, see <https://www.gnu.org/licenses/>.\n"
   pushp putstre call
 
-  :connect_serv
-
-    pushp "\ncarsee (info): nickname\n"
-    pushp putstre call
-
-    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
-    get0 pushp nickname_alloc_err jnz
-
-    pushl MSG_LEN2
-    over
-    pushp getstr call
-    get0 pushi EOF pushp read_nickname_err jeq
-    get0 write3                                            ;length of nickname
-
-    dup get0 pushp consume_input_if_too_large call
-    pushp trunc_nickname_err jnz
-
-    pushp "\ncarsee (info): password\n"
-    pushp putstre call
-
-    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the password
-    get0 pushp pass_alloc_err jnz
-
-    pushl MSG_LEN2
-    over
-    pushp getstr call
-    get0 pushi EOF pushp read_pass_err jeq
-    get0 write4                                            ;length of password
-
-    dup get0 pushp consume_input_if_too_large call
-    pushp trunc_pass_err jnz
-
-    pushp "\ncarsee (info): username\n"
-    pushp putstre call
-
-    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the username
-    get0 pushp username_alloc_err jnz
-
-    pushl MSG_LEN2
-    over
-    pushp getstr call
-    get0 pushi EOF pushp read_username_err jeq
-    get0 write5                                            ;length of username
-
-    dup get0 pushp consume_input_if_too_large call
-    pushp trunc_username_err jnz
-
-    pushi AF_INET
-    pushi SOCK_STREAM
-    pushi 0
-    pushp socket call                                      ;the sd
-    get0 pushi -1 pushp creat_socket_err jeq
-
-    write2                                                 ;save the sd in block 2
-
-    pushp "\ncarsee (info): host\n"
-    pushp putstre call
-
-    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the host
-    get0 pushp host_alloc_err jnz
-
-    pushl MSG_LEN2
-    over
-    pushp getstr call
-    get0 pushi EOF pushp read_host_err jeq
-
-    dup get0 pushp consume_input_if_too_large call
-    pushp trunc_host_err jnz
-
-    pushp "\ncarsee (info): port\n"
-    pushp putstre call
-
-    pushl MSG_LEN1 pushp aseg call                         ;chunk to store the port
-    get0 pushp port_alloc_err jnz
-
-    pushl MSG_LEN2
-    over
-    pushp getstr call
-    get0 pushi EOF pushp read_port_err jeq
-
-    dup get0 pushp consume_input_if_too_large call
-    pushp trunc_port_err jnz
-
-    over
-    over
-    swap
-    pushi AF_INET
-    pushi SOCK_STREAM
-    pushi 0
-    pushi 0
-    get2
-    pushp connect call
-    get0 pushp connect_err jnz
-
-    pushp "\ncarsee (info): connection successful\n" pushp putstre call
-
-    pushp flush call
-    pushp flush call
-
-    ;stack state: nickname password username
-    swap
-
-    get2
-    pushp "PASS "
-    pushui 5
-    pushp writef call                                      ;write to socket
-    get0 pushi -1 pushp pass_send_err jeq
-
-    get2
-    over
-    get4
-    pushp writef call
-    get0 pushi -1 pushp pass_send_err jeq
-
-    get2
-    pushp "\r\n"
-    pushui 2
-    pushp writef call
-    get0 pushi -1 pushp pass_send_err jeq
-
-    pushp flush call
-
-    swap
-
-    get2
-    pushp "NICK "
-    pushui 5
-    pushp writef call                                      ;write to socket
-    get0 pushi -1 pushp nick_send_err jeq
-
-    get2
-    over
-    get3
-    pushp writef call
-    get0 pushi -1 pushp nick_send_err jeq
-
-    get2
-    pushp "\r\n"
-    pushui 2
-    pushp writef call
-    get0 pushi -1 pushp nick_send_err jeq
-
-    pushp flush call
-
-    get2
-    pushp "USER "
-    pushui 5
-    pushp writef call                                      ;write to socket
-    get0 pushi -1 pushp user_send_err jeq
-
-    get2
-    over
-    get5
-    pushp writef call
-    get0 pushi -1 pushp user_send_err jeq
-
-    get2
-    pushp "\r\n"
-    pushui 2
-    pushp writef call
-    get0 pushi -1 pushp user_send_err jeq
-
-    pushp flush call
-
-
-    pushui state_P_or_colon write5                         ;used for the state machine implemented for parsing
-                                                           ;messages to respond to "PING"s
-
-    pushi -1 write6                                        ;offset into the atname buffer; used during atname check
-
-    pushui 0 write7                                        ;if it's set to a non-zero value, the socket is no
-                                                           ;longer accessible
-
-    pushui 0 write1                                        ;this is the number of unread instances of the set atname
-
-    pushui 0                                               ;if it's set to a non-zero value, the output is "held"
-
-    pushl MSG_LEN1 pushp aseg call
-    get0 pushp atname_alloc_err jnz
-
-    pushc '\0' over storec
-
-    pushl MSG_LEN pushp aseg call
-    get0 pushp msg_alloc_err jnz
-
-    pushp watch_new call
-    dup pushi -1 pushp creat_watch_err jeq
-    write3                                                 ;save the wd in block 3
-
-
-    set MAX_UINSTS 99
-
-    set state_ssr 0
-    set state_ssn 1
-    set state_P_or_colon 2
-    set state_prefix 3
-    set state_atleastonespace 4
-    set state_optspacesequence 5
-    set state_I 6
-    set state_N 7
-    set state_G 8
-    set state_space 9
-    set state_esr 10
-    set state_esn 11
-
-    :loop
-      write0
-      over
-      get0
-      swap
-      pushp unhold jnz
-
-      pushp unheld jmp
-
-      :unhold
-        pushp "\ncarsee (info): unheld\n" pushp putstre call
-        write0
-        swap
-        pop
-        pushui 0
-        swap
-        get0
-        pushp unheld jmp
-
-      :unheld
-        get3
-        pushi READFD
-        pushp fd_zero call
-
-        pushi STDIN
-        get3
-        pushi READFD
-        pushp fd_set call
-
-        get2
-        get3
-        pushi READFD
-        pushp fd_set call
-
-        get3
-        pushi 0
-        pushi -1
-        pushi -1
-        get2 pushi 1 addi
-        pushp watch call
-        get0 pushi -1 pushp watch_err jeq
-
-        get2
-        get3
-        pushi READFD
-        pushp fd_isset call
-        pushp recv_serv jnz
-
-        pushi STDIN
-        get3
-        pushi READFD
-        pushp fd_isset call
-        pushp read_input_source jnz
-
-        :read_input_source
-          pushl MSG_LEN2
-          over
-          pushp getstr call
-          get0 pushi EOF pushp climsg_read_err jeq
-          get0 write4                                      ;length of message
-
-          dup get0 pushp consume_input_if_too_large call
-          pushp trunc_climsg_err jnz
-
-          get4 get7 addi pushp loop jz
-
-          dup pushp "/quit" pushp strcmp call pushp quit jz
-          dup pushp "/cconnect" pushp strcmp call pushp idc_connect_serv jz
-          dup pushp "/test" pushp strcmp call pushp test jz
-          dup pushp "/help" pushp strcmp call pushp help jz
-          dup pushp "/status" pushp strcmp call pushp status jz
-          dup pushp "/setatname" pushp strcmp call pushp setatname jz
-          dup pushp "/getatname" pushp strcmp call pushp getatname jz
-          dup pushp "/unread" pushp strcmp call pushp unread_atname_insts jz
-          dup pushp "/read" pushp strcmp call pushp read_atname_insts jz
-          get7 pushp read_input_source jnz
-          dup pushp "/hold" pushp strcmp call pushp hold jz
-          pushp continue_to_preview jmp
-
-          :read_atname_insts
-            write0
-            write1
-            swap pop pushui 0 swap
-            get1
-            get0
-            get7 pushp read_input_source jnz
-            pushp loop jmp
-
-          :unread_atname_insts
-            ;stack state: inst held atname msg
-            get1
-
-            dup pushui MAX_UINSTS pushp less_than_max_uinsts jge
-            pushp more_than_max_uinsts jmp
-
-            :more_than_max_uinsts
-              pop
-              pushui MAX_UINSTS
-              pushp "\ncarsee(info): %ui+ unread atname instances\n"
-              pushp putfmte call
-              get0 pushi EOF pushp unread_display_err jeq
-              get7 pushp read_input_source jnz
-              pushp loop jmp
-
-            :less_than_max_uinsts
-              pushp "\ncarsee(info): %ui unread atname instances\n"
-              pushp putfmte call
-              get0 pushi EOF pushp unread_display_err jeq
-              get7 pushp read_input_source jnz
-              pushp loop jmp
-
-          :getatname
-            over
-            pushp "\ncarsee (info): atname set to '%t'\n"
-            pushp putfmte call
-
-            get7 pushp read_input_source jnz
-            pushp loop jmp
-
-          :setatname
-            pushp "\ncarsee (info): atname\n"
-            pushp putstre call
-
-            over
-
-            pushl MSG_LEN2
-            swap
-            pushp getstr call
-            get0 pushi EOF pushp read_atname_err jeq
-
-            over get0 pushp consume_input_if_too_large call
-            pushp trunc_atname_err jnz
-
-            over
-            pushc '@'
-            swap
-            pushp chrstr call
-            pushi -1 pushp atname_contains_at jne
-
-            over
-            pushp "\ncarsee (info): atname set to '%t'\n"
-            pushp putfmte call
-
-            get7 pushp read_input_source jnz
-            pushp loop jmp
-
-            :atname_contains_at
-              pushp "\ncarsee (error): atname cannot contain the symbol '@'\n"
-              pushp putstre call
-              over pushc '\0' swap storec
-              get7 pushp read_input_source jnz
-              pushp loop jmp
-
-          :status
-            get7 pushp status_connected jz
-            pushp status_not_connected jmp
-
-            :status_not_connected
-              pushp "\ncarsee (info): server has closed connection\n"
-              get0 pushi EOF pushp status_display_err jeq
-              pushp putstre call
-              pushp read_input_source jmp
-
-            :status_connected
-              pushp "\ncarsee (info): server has NOT closed connection\n"
-              get0 pushi EOF pushp status_display_err jeq
-              pushp putstre call
-              pushp loop jmp
-
-          :test
-            pushp "\ncarsee (info): passed\n"
-            pushp putstre call
-            get0 pushi EOF pushp test_reply_err jeq
-            get7 pushp read_input_source jnz
-            pushp loop jmp
-
-          :help
-            pushp "\n\
-carsee (info): /quit: close client\n\
-carsee (info): /hold (i): pauses all operations until at least one character is received from the input source\n\
-carsee (info): /cconnect: connects to a (possibly different) server\n\
-carsee (info): /test: replies with a \"passed\" message\n\
-carsee (info): /status: displays the connection status of the server\n\
-carsee (info): /setatname: sets your atname for this session\n\
-carsee (info): /getatname: displays the set atname for this session\n\
-carsee (info): /unread: displays the number of unread atname instances\n\
-carsee (info): /read: resets the unread atname instance counter\n\
-carsee (info): /help: displays this help message\n\
-carsee (info): ---\n\
-carsee (info): commands suffixed with \" (i)\" are ignored once the server closes connection\n"
-            pushp putstre call
-            get0 pushi EOF pushp help_display_err jeq
-            pushp loop jmp
-
-          :idc_connect_serv
-            pushp flush call
-            get2 pushp closef call
-            get3 pushp watch_close call
-            pushp connect_serv jmp
-
-          :hold
-            pushp "\ncarsee (info): held\n" pushp putstre call
-            write0
-            swap
-            pop
-            pushui 1
-            swap
-            get0
-            pushp read_input_source jmp
-
-          :continue_to_preview
-            pushp "\ncarsee (preview): " pushp putstre call
-            get0 pushi EOF pushp climsg_preview_err jeq
-
-            pushi STDERR
-            over
-            get4 ;message length
-            pushp writef call
-            get0 pushi -1 pushp climsg_preview_err jeq
-
-            pushp "\n" pushp putstre call
-            get0 pushi EOF pushp climsg_preview_err jeq
-
-            get2
-            over
-            get4 ;message length
-            pushp writef call
-            get0 pushi -1 pushp climsg_send_err jeq
-
-            get2
-            pushp "\r\n"
-            pushui 2
-            pushp writef call
-            get0 pushi -1 pushp climsg_send_err jeq
-
-            pushp loop jmp
-
-        :recv_serv
-          get2
-          over ;allocated chunk
-          pushl MSG_LEN
-          pushp readf call
-          get0 pushi -1 pushp recv_serv_err jeq
-          get0 write4
-
-          get4 pushp serv_closed_connection jz
-          pushp continue_servmsg_write jmp
-
-          :serv_closed_connection
-            pushp "\ncarsee (info): server closed connection\n"
-            pushp putstre call
-            pushui 1 write7
-            pushp read_input_source jmp
-
-          :continue_servmsg_write
-            pushi STDERR
-            over
-            get4
-            pushp writef call
-            get0 pushi -1 pushp servmsg_write_err jeq
-
-            dup
-
-            :check_ping_and_atname
-              get5 pushui state_ssr pushp check_ssr jeq
-              get5 pushui state_ssn pushp check_ssn jeq
-              get5 pushui state_P_or_colon pushp check_P_or_colon jeq
-              get5 pushui state_prefix pushp check_prefix jeq
-              get5 pushui state_atleastonespace pushp check_atleastonespace jeq
-              get5 pushui state_optspacesequence pushp check_optspacesequence jeq
-              get5 pushui state_I pushp check_I jeq
-              get5 pushui state_N pushp check_N jeq
-              get5 pushui state_G pushp check_G jeq
-              get5 pushui state_space pushp check_space jeq
-              get5 pushui state_esr pushp check_esr jeq
-              get5 pushui state_esn pushp check_esn jeq
-
-              :check_atname
-                write0 over get0 swap loadc pushp continue_checking jz
-                pushc '@' over loadc pushp found_at jeq
-                pushi -1 get6 pushp match_atname jgt
-                pushp continue_checking jmp
-
-                :match_atname
-                  write0 over get0 swap get6 addp loadc pushp allmatch_atname_maybe jz
-                  write0 over get0 swap get6 addp loadc over loadc pushp atname_onematch jeq
-                  pushp atname_notmatch jmp
-
-                  :allmatch_atname_maybe
-                    pushc ' ' over loadc pushp allmatch_atname jeq
-                    pushc '\f' over loadc pushp allmatch_atname jeq
-                    pushc '\r' over loadc pushp allmatch_atname jeq
-                    pushc '\t' over loadc pushp allmatch_atname jeq
-                    pushc '\v' over loadc pushp allmatch_atname jeq
-                    pushp atname_notmatch jmp
-
-                    :allmatch_atname
-                      pushp "\a" pushp putstre call
-                      get1
-                      dup pushui MAX_UINSTS pushp inc_inst_count jge
-                      pushp continue_noinc_inst jmp
-
-                      :inc_inst_count
-                        pushui 1 addui write1
-                        pushi -1 write6
-                        pushp continue_checking jmp
-
-                      :continue_noinc_inst
-                        pop
-                        pushi -1 write6
-                        pushp continue_checking jmp
-
-                  :atname_onematch
-                    pushui 1 get6 addl write6
-                    pushp continue_checking jmp
-
-                  :atname_notmatch
-                    pushi -1 write6
-                    pushp continue_checking jmp
-
-                :found_at
-                  pushui 0 write6
-                  pushp continue_checking jmp
-
-                :continue_checking
-                  pushui 1 addp
-                  pushui 1 get4 subl dup write4
-                  pushp check_ping_and_atname jnz
-                  pop
-                  pushp loop jmp
-
-              :transition_to_ssr
-                pushui state_ssr write5
-                pushp check_atname jmp
-
-              :check_ssr
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp check_atname jmp
-
-              :transition_to_ssn
-                pushui state_ssn write5
-                pushp check_atname jmp
-
-              :check_ssn
-                pushc '\n' over loadc pushp transition_to_P_or_colon jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_P_or_colon
-                pushui state_P_or_colon write5
-                pushp check_atname jmp
-
-              :check_P_or_colon
-                pushc 'P' over loadc pushp transition_to_I jeq
-                pushc ':' over loadc pushp transition_to_prefix jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_prefix
-                pushui state_prefix write5
-                pushp check_atname jmp
-
-              :check_prefix
-                pushc ' ' over loadc pushp transition_to_atleastonespace jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_atleastonespace
-                pushui state_atleastonespace write5
-                pushp check_atname jmp
-
-              :check_atleastonespace
-                pushc ' ' over loadc pushp transition_to_optspacesequence jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_optspacesequence
-                pushui state_optspacesequence write5
-                pushp check_atname jmp
-
-              :check_optspacesequence
-                pushc ' ' over loadc pushp transition_to_optspacesequence jeq
-                pushc 'P' over loadc pushp transition_to_I jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_I
-                pushui state_I write5
-                pushp check_atname jmp
-
-              :check_I
-                pushc 'I' over loadc pushp transition_to_N jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_N
-                pushui state_N write5
-                pushp check_atname jmp
-
-              :check_N
-                pushc 'N' over loadc pushp transition_to_G jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_G
-                pushui state_G write5
-                pushp check_atname jmp
-
-              :check_G
-                pushc 'G' over loadc pushp transition_to_space jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-              :transition_to_space
-                pushui state_space write5
-                pushp check_atname jmp
-
-              :check_space
-                pushc ' ' over loadc pushp send_pong jeq
-                pushc '\r' over loadc pushp transition_to_ssn jeq
-                pushp transition_to_ssr jmp
-
-                :send_pong
-                  get2
-                  pushp "PONG "
-                  pushui 5
-                  pushp writef call
-                  get0 pushi -1 pushp pong_send_err jeq
-
-                  pushp transition_to_esr jmp
-
-              :transition_to_esr
-                pushui state_esr write5
-                pushp check_atname jmp
-
-              :check_esr
-                get2
-                over
-                pushui 1
-                pushp writef call
-                get0 pushi -1 pushp pong_send_err jeq
-
-                pushc '\r' over loadc pushp transition_to_esn jeq
-                pushp check_atname jmp
-
-              :transition_to_esn
-                pushui state_esn write5
-                pushp check_atname jmp
-
-              :check_esn
-                get2
-                over
-                pushui 1
-                pushp writef call
-                get0 pushi -1 pushp pong_send_err jeq
-
-                pushc '\n' over loadc pushp end_pong_msg jeq
-                pushp transition_to_esr jmp
-
-                :end_pong_msg
-                  pushp transition_to_P_or_colon jmp
+  if(pushp est_connection call nz){
+    pushp phclean call
+    pushi 1 hltr
+  }
+  if(pushp main_loop call nz){
+    pushp phclean call
+    pushi 1 hltr
+  }
+  pushp phclean call
+  hlt
