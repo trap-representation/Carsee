@@ -459,7 +459,7 @@ set MSG_LEN2 510
 
 :recv_server
   get2
-  over ;allocated chunk
+  over
   pushl MSG_LEN
   if(pushp readf call get0 pushi -1 eq){
     pushp "\ncarsee (error): failed to receive message from server\n"
@@ -507,7 +507,7 @@ set MSG_LEN2 510
     get3 pushp watch_close call
     pushi 1 ret
   }
-  get0 write4 ;length of message
+  get0 write4
 
   dup get0
   if(pushp consume_input_if_too_large call nz){
@@ -743,7 +743,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     }
     pushi STDERR
     over
-    get4 ;message length
+    get4
     if(pushp writef call get0 pushi -1 eq){
       pushp "\ncarsee (error): failed to display message preview\n"
       pushp putstre call
@@ -765,7 +765,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     }
     get2
     over
-    get4 ;message length
+    get4
     if(pushp writef call get0 pushi -1 eq){
       pushp "\ncarsee (error): failed to send message to server\n"
       pushp putstre call
@@ -864,7 +864,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
   pushp putstre call
 
   pushl MSG_LEN1
-  if(pushp aseg call get0 nz){ ;chunk to store the username
+  if(pushp aseg call get0 nz){
     pushp "\ncarsee (error): failed to allocate enough memory\n"
     pushp putstre call
     pushi 1 ret
@@ -878,7 +878,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     pushp flush call
     pushi 1 ret
   }
-  get0 write3 ;length of nickname
+  get0 write3
 
   dup get0
   if(pushp consume_input_if_too_large call nz){
@@ -890,7 +890,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
   pushp putstre call
 
   pushl MSG_LEN1
-  if(pushp aseg call get0 nz){ ;chunk to store the password
+  if(pushp aseg call get0 nz){
     pushp "\ncarsee (error): failed to allocate enough memory\n"
     pushp putstre call
     pop
@@ -907,7 +907,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     pushp flush call
     pushi 1 ret
   }
-  get0 write4 ;length of password
+  get0 write4
 
   dup get0
   if(pushp consume_input_if_too_large call nz){
@@ -916,10 +916,10 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     pushi 1 ret
   }
 
-  pushp "\ncarsee (info): username\n"
+  pushp "\ncarsee (info): user\n"
   pushp putstre call
   pushl MSG_LEN1
-  if(pushp aseg call get0 nz){ ;chunk to store the username
+  if(pushp aseg call get0 nz){
     pushp "\ncarsee (error): failed to allocate enough memory\n"
     pushp putstre call
     pop
@@ -938,7 +938,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
     pushp flush call
     pushi 1 ret
   }
-  get0 write5 ;length of username
+  get0 write5
 
   dup get0
   if(pushp consume_input_if_too_large call nz){
@@ -967,7 +967,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
   pushp putstre call
 
   pushl MSG_LEN1
-  if(pushp aseg call get0 nz){ ;chunk to store the host
+  if(pushp aseg call get0 nz){
     pushp "\ncarsee (error): failed to allocate enough memory\n"
     pushp putstre call
     pop
@@ -1005,7 +1005,7 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
   pushp putstre call
 
   pushl MSG_LEN1
-  if(pushp aseg call get0 nz){ ;chunk to store the port
+  if(pushp aseg call get0 nz){
     pushp "\ncarsee (error): failed to allocate enough memory\n"
     pushp putstre call
     pop
@@ -1067,7 +1067,6 @@ carsee (info): commands suffixed with \" (i)\" are ignored once the server close
   pushp flush call
   pushp flush call
 
-  ;stack state: nickname password username
   swap
 
   get2
