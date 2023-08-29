@@ -45,7 +45,6 @@ set MSG_LEN2 510
   else if(pushi 0 gt){
     pushp "\ncarsee (error): failed to read from input source\n"
     pushp putstre call
-    pop
     pushi 1
     ret
   }
@@ -62,7 +61,7 @@ set MSG_LEN2 510
     pushi 0
     ret
   }
-
+  pop
   pushp consume_till_end call
   ret
 
